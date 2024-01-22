@@ -1,0 +1,3 @@
+[submodule "Packages/GameEventsSystem"]
+	path = Packages/GameEventsSystem
+	url = https://github.com/FelipeIshimine/GameEventsSystem
