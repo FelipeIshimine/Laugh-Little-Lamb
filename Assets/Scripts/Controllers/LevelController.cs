@@ -7,15 +7,15 @@ namespace Controllers
 {
 	public class LevelController : MonoBehaviour
 	{
-		private LevelView levelView;
-		private BoardModel board;
+		[SerializeField] private LevelView levelView;
+		[SerializeField] private TilemapModel tilemap;
         
 		public LevelController(LevelView levelView)
 		{
 			this.levelView = levelView;
-			board = new BoardModel();
+			tilemap = new TilemapModel();
 			
-			Debug.Log($"Board ID:{board.Index}");
+			Debug.Log($"Board ID:{tilemap.Index}");
 		}
 	}
 }
