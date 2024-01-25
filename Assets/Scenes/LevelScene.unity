@@ -289,6 +289,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08b52f32190b6994fbc716bf00b953df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelView: {fileID: 0}
+  tilemap:
+    Bounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    FloorTiles: 
 --- !u!4 &544586776
 Transform:
   m_ObjectHideFlags: 0
@@ -431,8 +437,381 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d61027dd4c62ae43b3eb76c7840ac47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkableSprites: []
+  floorTiles:
+  - {fileID: 11400000, guid: 94a879e887a509044885fcf90e9c69de, type: 2}
+  - {fileID: 11400000, guid: c8b30f0f98732ad4fbdb660977083edc, type: 2}
+  wallTiles: []
+  playerTile: {fileID: 0}
+  exitTile: {fileID: 0}
   tilemap: {fileID: 1317649893}
+  tilemapModel:
+    Bounds:
+      m_Position: {x: -15, y: -11, z: 0}
+      m_Size: {x: 24, y: 15, z: 1}
+    FloorTiles: 260000002700000028000000290000002a0000002b00000034000000350000003600000037000000380000003b0000003c0000003d0000003e0000003f000000400000004100000042000000430000004400000045000000460000004c0000004d0000004e0000004f000000500000005100000052000000530000005a0000005b0000005c0000005d0000005e0000005f000000630000006400000065000000660000006700000068000000690000006a0000006b0000006d0000006e0000006f0000007000000073000000740000007500000076000000770000007a0000007b0000007c0000007d0000007e0000007f0000008000000081000000820000008300000085000000860000008700000088000000890000008b0000008c0000008d0000008e0000008f00000092000000930000009400000095000000960000009700000098000000990000009a0000009b0000009e0000009f000000a0000000a1000000a3000000a4000000a5000000a6000000aa000000ab000000ac000000ad000000ae000000af000000b0000000b1000000b2000000b3000000b4000000b5000000b6000000b7000000b8000000b9000000bb000000bc000000bd000000be000000c1000000c2000000c3000000c5000000c6000000c7000000c8000000ce000000cf000000d0000000d1000000d3000000d4000000d5000000da000000db000000dd000000de000000df000000e0000000e2000000e3000000e4000000e5000000e6000000e7000000e8000000e9000000eb000000ec000000ed000000f2000000f3000000f6000000f7000000f8000000f9000000fa000000fb000000fc000000fd000000fe000000ff00000000010000010100000301000004010000050100000b0100000c01000010010000110100001201000013010000140100001501000018010000190100001b0100001c0100001d0100001e0100002401000025010000260100002f0100003001000031010000330100003401000035010000360100003d0100003e0100003f010000400100004101000042010000430100004401000045010000460100004701000048010000490100004b0100004c0100004d0100004e0100006401000065010000
+  pathfinder:
+    Adjacency:
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 270000003e000000
+    - Values: 26000000280000003f000000
+    - Values: 270000002900000040000000
+    - Values: 280000002a00000041000000
+    - Values: 290000002b00000042000000
+    - Values: 2a00000043000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 350000004c000000
+    - Values: 34000000360000004d000000
+    - Values: 35000000370000004e000000
+    - Values: 36000000380000004f000000
+    - Values: 3700000050000000
+    - Values: 
+    - Values: 
+    - Values: 3c00000053000000
+    - Values: 3b0000003d000000
+    - Values: 3c0000003e000000
+    - Values: 3d0000003f00000026000000
+    - Values: 3e0000004000000027000000
+    - Values: 3f0000004100000028000000
+    - Values: 400000004200000029000000
+    - Values: 41000000430000005a0000002a000000
+    - Values: 42000000440000005b0000002b000000
+    - Values: 43000000450000005c000000
+    - Values: 44000000460000005d000000
+    - Values: 450000005e000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 4d0000006400000034000000
+    - Values: 4c0000004e0000006500000035000000
+    - Values: 4d0000004f0000006600000036000000
+    - Values: 4e000000500000006700000037000000
+    - Values: 4f000000510000006800000038000000
+    - Values: 500000005200000069000000
+    - Values: 51000000530000006a000000
+    - Values: 520000006b0000003b000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 5b00000042000000
+    - Values: 5a0000005c0000007300000043000000
+    - Values: 5b0000005d0000007400000044000000
+    - Values: 5c0000005e0000007500000045000000
+    - Values: 5d0000005f0000007600000046000000
+    - Values: 5e00000077000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 640000007b000000
+    - Values: 63000000650000007c0000004c000000
+    - Values: 64000000660000007d0000004d000000
+    - Values: 65000000670000007e0000004e000000
+    - Values: 66000000680000007f0000004f000000
+    - Values: 67000000690000008000000050000000
+    - Values: 680000006a0000008100000051000000
+    - Values: 690000006b0000008200000052000000
+    - Values: 6a0000008300000053000000
+    - Values: 
+    - Values: 6e00000085000000
+    - Values: 6d0000006f00000086000000
+    - Values: 6e0000007000000087000000
+    - Values: 6f00000088000000
+    - Values: 
+    - Values: 
+    - Values: 740000008b0000005b000000
+    - Values: 73000000750000008c0000005c000000
+    - Values: 74000000760000008d0000005d000000
+    - Values: 75000000770000008e0000005e000000
+    - Values: 760000008f0000005f000000
+    - Values: 
+    - Values: 
+    - Values: 7b00000092000000
+    - Values: 7a0000007c0000009300000063000000
+    - Values: 7b0000007d0000009400000064000000
+    - Values: 7c0000007e0000009500000065000000
+    - Values: 7d0000007f0000009600000066000000
+    - Values: 7e000000800000009700000067000000
+    - Values: 7f000000810000009800000068000000
+    - Values: 80000000820000009900000069000000
+    - Values: 81000000830000009a0000006a000000
+    - Values: 820000009b0000006b000000
+    - Values: 
+    - Values: 860000006d000000
+    - Values: 85000000870000009e0000006e000000
+    - Values: 86000000880000009f0000006f000000
+    - Values: 8700000089000000a000000070000000
+    - Values: 88000000a1000000
+    - Values: 
+    - Values: 8c000000a300000073000000
+    - Values: 8b0000008d000000a400000074000000
+    - Values: 8c0000008e000000a500000075000000
+    - Values: 8d0000008f000000a600000076000000
+    - Values: 8e00000077000000
+    - Values: 
+    - Values: 
+    - Values: 93000000aa0000007a000000
+    - Values: 9200000094000000ab0000007b000000
+    - Values: 9300000095000000ac0000007c000000
+    - Values: 9400000096000000ad0000007d000000
+    - Values: 9500000097000000ae0000007e000000
+    - Values: 9600000098000000af0000007f000000
+    - Values: 9700000099000000b000000080000000
+    - Values: 980000009a000000b100000081000000
+    - Values: 990000009b000000b200000082000000
+    - Values: 9a000000b300000083000000
+    - Values: 
+    - Values: 
+    - Values: 9f000000b600000086000000
+    - Values: 9e000000a0000000b700000087000000
+    - Values: 9f000000a1000000b800000088000000
+    - Values: a0000000b900000089000000
+    - Values: 
+    - Values: a4000000bb0000008b000000
+    - Values: a3000000a5000000bc0000008c000000
+    - Values: a4000000a6000000bd0000008d000000
+    - Values: a5000000be0000008e000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: ab000000c200000092000000
+    - Values: aa000000ac000000c300000093000000
+    - Values: ab000000ad00000094000000
+    - Values: ac000000ae000000c500000095000000
+    - Values: ad000000af000000c600000096000000
+    - Values: ae000000b0000000c700000097000000
+    - Values: af000000b1000000c800000098000000
+    - Values: b0000000b200000099000000
+    - Values: b1000000b30000009a000000
+    - Values: b2000000b40000009b000000
+    - Values: b3000000b5000000
+    - Values: b4000000b6000000
+    - Values: b5000000b7000000ce0000009e000000
+    - Values: b6000000b8000000cf0000009f000000
+    - Values: b7000000b9000000d0000000a0000000
+    - Values: b8000000d1000000a1000000
+    - Values: 
+    - Values: bc000000d3000000a3000000
+    - Values: bb000000bd000000d4000000a4000000
+    - Values: bc000000be000000d5000000a5000000
+    - Values: bd000000a6000000
+    - Values: 
+    - Values: 
+    - Values: c2000000
+    - Values: c1000000c3000000da000000aa000000
+    - Values: c2000000db000000ab000000
+    - Values: 
+    - Values: c6000000dd000000ad000000
+    - Values: c5000000c7000000de000000ae000000
+    - Values: c6000000c8000000df000000af000000
+    - Values: c7000000e0000000b0000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: cf000000e6000000b6000000
+    - Values: ce000000d0000000e7000000b7000000
+    - Values: cf000000d1000000e8000000b8000000
+    - Values: d0000000e9000000b9000000
+    - Values: 
+    - Values: d4000000eb000000bb000000
+    - Values: d3000000d5000000ec000000bc000000
+    - Values: d4000000ed000000bd000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: db000000f2000000c2000000
+    - Values: da000000f3000000c3000000
+    - Values: 
+    - Values: de000000c5000000
+    - Values: dd000000df000000f6000000c6000000
+    - Values: de000000e0000000f7000000c7000000
+    - Values: df000000f8000000c8000000
+    - Values: 
+    - Values: e3000000fa000000
+    - Values: e2000000e4000000fb000000
+    - Values: e3000000e5000000fc000000
+    - Values: e4000000e6000000fd000000
+    - Values: e5000000e7000000fe000000ce000000
+    - Values: e6000000e8000000ff000000cf000000
+    - Values: e7000000e900000000010000d0000000
+    - Values: e800000001010000d1000000
+    - Values: 
+    - Values: ec00000003010000d3000000
+    - Values: eb000000ed00000004010000d4000000
+    - Values: ec00000005010000d5000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: f3000000da000000
+    - Values: f20000000b010000db000000
+    - Values: 
+    - Values: 
+    - Values: f7000000de000000
+    - Values: f6000000f8000000df000000
+    - Values: f7000000f900000010010000e0000000
+    - Values: f8000000fa00000011010000
+    - Values: f9000000fb00000012010000e2000000
+    - Values: fa000000fc00000013010000e3000000
+    - Values: fb000000fd00000014010000e4000000
+    - Values: fc000000fe00000015010000e5000000
+    - Values: fd000000ff000000e6000000
+    - Values: fe00000000010000e7000000
+    - Values: ff0000000101000018010000e8000000
+    - Values: 0001000019010000e9000000
+    - Values: 
+    - Values: 040100001b010000eb000000
+    - Values: 03010000050100001c010000ec000000
+    - Values: 040100001d010000ed000000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 0c010000f3000000
+    - Values: 0b01000024010000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 11010000f8000000
+    - Values: 1001000012010000f9000000
+    - Values: 1101000013010000fa000000
+    - Values: 1201000014010000fb000000
+    - Values: 1301000015010000fc000000
+    - Values: 14010000fd000000
+    - Values: 
+    - Values: 
+    - Values: 190100003001000000010000
+    - Values: 180100003101000001010000
+    - Values: 
+    - Values: 1c0100003301000003010000
+    - Values: 1b0100001d0100003401000004010000
+    - Values: 1c0100001e0100003501000005010000
+    - Values: 1d01000036010000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 250100000c010000
+    - Values: 24010000260100003d010000
+    - Values: 250100003e010000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 3001000047010000
+    - Values: 2f010000310100004801000018010000
+    - Values: 300100004901000019010000
+    - Values: 
+    - Values: 340100004b0100001b010000
+    - Values: 33010000350100004c0100001c010000
+    - Values: 34010000360100004d0100001d010000
+    - Values: 350100004e0100001e010000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 3e01000025010000
+    - Values: 3d0100003f01000026010000
+    - Values: 3e01000040010000
+    - Values: 3f01000041010000
+    - Values: 4001000042010000
+    - Values: 4101000043010000
+    - Values: 4201000044010000
+    - Values: 4301000045010000
+    - Values: 4401000046010000
+    - Values: 4501000047010000
+    - Values: 46010000480100002f010000
+    - Values: 470100004901000030010000
+    - Values: 4801000031010000
+    - Values: 
+    - Values: 4c01000033010000
+    - Values: 4b0100004d0100006401000034010000
+    - Values: 4c0100004e0100006501000035010000
+    - Values: 4d01000036010000
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 
+    - Values: 650100004c010000
+    - Values: 640100004d010000
+    - Values: 
+    - Values: 
+  debugMode: 6
 --- !u!1 &825021864
 GameObject:
   m_ObjectHideFlags: 0
@@ -1120,16 +1499,6 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: 9, y: -9, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: -13, y: -8, z: 0}
     second:
       serializedVersion: 2
@@ -1350,16 +1719,6 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: 9, y: -8, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: -13, y: -7, z: 0}
     second:
       serializedVersion: 2
@@ -1575,16 +1934,6 @@ Tilemap:
       serializedVersion: 2
       m_TileIndex: 0
       m_TileSpriteIndex: 0
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
-  - first: {x: 9, y: -7, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1820,16 +2169,6 @@ Tilemap:
       m_TileObjectToInstantiateIndex: 65535
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
-  - first: {x: 9, y: -6, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
   - first: {x: -14, y: -5, z: 0}
     second:
       serializedVersion: 2
@@ -2051,16 +2390,6 @@ Tilemap:
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
   - first: {x: 8, y: -5, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
-  - first: {x: 9, y: -5, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 2
@@ -2771,6 +3100,16 @@ Tilemap:
       dummyAlignment: 0
       m_AllTileFlags: 1073741825
   - first: {x: 7, y: -2, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 2
+      m_TileSpriteIndex: 2
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: 8, y: -2, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 2
@@ -3866,17 +4205,17 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: c8b30f0f98732ad4fbdb660977083edc, type: 2}
   - m_RefCount: 14
     m_Data: {fileID: 11400000, guid: 5d9c77fd3923fad4cb33ddb400eddb4f, type: 2}
-  - m_RefCount: 103
+  - m_RefCount: 99
     m_Data: {fileID: 11400000, guid: 77f198fc9e4c9ca42ab179208cc87011, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 204
     m_Data: {fileID: 21300000, guid: a06970b8ec01f354f99d2055dc6f952a, type: 3}
   - m_RefCount: 14
     m_Data: {fileID: 21300000, guid: 2f2d81326a8219e4fa4de5334b007bcc, type: 3}
-  - m_RefCount: 103
+  - m_RefCount: 99
     m_Data: {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 321
+  - m_RefCount: 317
     m_Data:
       e00: 1
       e01: 0
@@ -3895,13 +4234,13 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 321
+  - m_RefCount: 317
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -15, y: -11, z: 0}
-  m_Size: {x: 25, y: 15, z: 1}
+  m_Size: {x: 24, y: 15, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:

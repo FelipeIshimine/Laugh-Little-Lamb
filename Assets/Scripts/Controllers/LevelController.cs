@@ -13,9 +13,6 @@ namespace Controllers
 		public LevelController(LevelView levelView)
 		{
 			this.levelView = levelView;
-			tilemap = new TilemapModel();
-			
-			Debug.Log($"Board ID:{tilemap.Index}");
 		}
 	}
 }

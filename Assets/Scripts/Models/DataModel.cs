@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Model;
 
-namespace Model
+namespace Models
 {
 	[System.Serializable]
 	public abstract class DataModel : IDisposable
