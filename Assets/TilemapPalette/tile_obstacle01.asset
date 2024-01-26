@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: tile_obstacle01
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300000, guid: 2f2d81326a8219e4fa4de5334b007bcc, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.36084905, g: 0.38282025, b: 0.5, a: 1}
   m_Transform:
     e00: 1
     e01: 0
