@@ -21,9 +21,7 @@ namespace Controllers
 		{
 			await Addressables.LoadSceneAsync(levelScene).Task;
 		
-			var levelView = FindFirstObjectByType<LevelView>();
-
-			LevelController levelController = new LevelController(levelView);
+			var levelController = FindFirstObjectByType<LevelController>();
 			
 			
 
