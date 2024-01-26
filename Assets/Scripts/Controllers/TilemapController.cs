@@ -12,7 +12,10 @@ namespace Controllers
 	public class TilemapController : MonoBehaviour, ISerializationCallbackReceiver
 	{
 		private static readonly TileBase[] AllTiles = new TileBase[1024];
-   
+
+		[SerializeField] private Transform from;
+		[SerializeField] private Transform to;
+		
 		[SerializeField] private List<Tile> floorTiles;
 		[SerializeField] private List<Tile> wallTiles;
    
@@ -23,17 +26,23 @@ namespace Controllers
 
 		[SerializeField] public TilemapModel tilemapModel;
 
-		private Pathfinder pathfinder;
-   
+		[SerializeField]private Pathfinder pathfinder;
+
+		[SerializeField] private List<int> path;
+		
 		public DebugMode debugMode;
 
+		[SerializeField] private int debugNeighbours = 0;
+		
 		[Flags]
 		public enum DebugMode
 		{
 			None = 0,
-			Coordinates = 1,
-			WalkableTiles = 2,
-			Pathfinding = 4
+			Index = 1,
+			Coordinates = 2,
+			WalkableTiles = 4,
+			Adjacencies = 8,
+			Path = 16
 		}
    
 		[Button]
@@ -91,6 +100,18 @@ namespace Controllers
 					}  
 				}
 
+				if ((debugMode & DebugMode.Index) != 0)
+				{
+					for (var index = 0; index < count; index++)
+					{
+						var coordinate = bounds.min + new Vector3Int(index % bounds.size.x, index / bounds.size.x);
+						var center = tilemap.GetCellCenterWorld(coordinate);
+#if UNITY_EDITOR
+						UnityEditor.Handles.Label(center, $"{index}");
+#endif
+					}  
+				}
+
 				if (tilemapModel != null && (debugMode & DebugMode.WalkableTiles) != 0)
 				{
 					var color = new Color(0,1,0,.5f);
@@ -105,17 +126,17 @@ namespace Controllers
 				}
 
 				List<Vector3> points = new List<Vector3>();
-				if (tilemapModel != null && pathfinder != null && (debugMode & DebugMode.Pathfinding) != 0)
+				if (tilemapModel != null && pathfinder != null && (debugMode & DebugMode.Adjacencies) != 0)
 				{
 					var color = new Color(1,1,1,1f);
 					Gizmos.color = color;
 
-					for (var index = 0; index < pathfinder.adjacency.Length; index++)
+					for (var index = 0; index < pathfinder.adjacencies.Length; index++)
 					{
 						var coordinate = tilemapModel.IndexToCoordinate(index);
 						var worldPos = tilemap.GetCellCenterWorld(coordinate);
 
-						var neighbours = pathfinder.adjacency[index];
+						var neighbours = pathfinder.adjacencies[index];
 
 						foreach (int neighbour in neighbours)
 						{
@@ -126,8 +147,48 @@ namespace Controllers
 				}
 				Gizmos.DrawLineList(points.ToArray());
 			}
+
+
+			if ((debugMode & DebugMode.Path) != 0 && tilemapModel != null && pathfinder!= null)
+			{
+				var fromIndex = tilemapModel.CoordinateToIndex((Vector2Int)tilemap.WorldToCell(from.position));
+				var toIndex = tilemapModel.CoordinateToIndex((Vector2Int)tilemap.WorldToCell(to.position));
+
+				//Debug.Log($"{fromIndex}>{toIndex}");
+				if (fromIndex >= 0 && fromIndex < tilemapModel.Count &&
+				    toIndex >= 0 && toIndex < tilemapModel.Count)
+				{
+					bool success = pathfinder.TryFindPath(fromIndex, toIndex, out path, out _);
+					
+					//Debug.Log(path.Count);
+					Gizmos.color = success ? Color.yellow : Color.red;
+					if (path != null && path.Count > 0)
+					{
+						Gizmos.DrawLineStrip(
+							path.ConvertAll(x => tilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(x)))
+							    .ToArray(),
+							false);
+					}
+				}
+			}
+
+
+			if (debugNeighbours >= 0 && debugNeighbours < pathfinder.adjacencies.Length)
+			{
+				Gizmos.color = Color.cyan;
+				var center = tilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(debugNeighbours));
+				foreach (var neighbour in pathfinder.adjacencies[debugNeighbours])
+				{
+					var other =tilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(neighbour));
+					Gizmos.DrawLine(center, other);
+				}
+
+				
+			}
+			
 		}
 
+		
 		public void OnBeforeSerialize()
 		{
 		}
@@ -136,26 +197,30 @@ namespace Controllers
 		{
 			pathfinder = new Pathfinder(tilemapModel);
 		}
+		
+		
 	}
 
 	[System.Serializable]
 	public class Pathfinder
 	{
-		public Neighbours[] adjacency;
+		public Neighbours[] adjacencies;
 		public Distances[] distances;
+		private TilemapModel model;
 		
 		public Pathfinder(TilemapModel model)
 		{
-			adjacency = new Neighbours[model.Count];
+			this.model = model;
+			adjacencies = new Neighbours[model.Count];
 
-			for (int i = 0; i < adjacency.Length; i++)
+			for (int i = 0; i < adjacencies.Length; i++)
 			{
-				adjacency[i] = new Neighbours();
+				adjacencies[i] = new Neighbours();
 			}
 			
 			foreach (int index in model.FloorTiles)
 			{
-				var neighbours = adjacency[index];
+				var neighbours = adjacencies[index];
 				foreach (var neighbour in model.GetNeighbours(index))
 				{
 					if (model.IsFloor(neighbour))
@@ -166,25 +231,103 @@ namespace Controllers
 			}
 
 			distances = new Distances[model.Count];
-			for (int i = 0; i < adjacency.Length; i++)
+			for (int i = 0; i < adjacencies.Length; i++)
 			{
-				distances[i] = new Distances(adjacency.Length);
+				distances[i] = new Distances(adjacencies.Length);
 			}
 			
-			for (var x = 0; x < model.FloorTiles.Count; x++)
+			for (var x = 0; x < model.Count; x++)
 			{
-				for (int y = x; y < model.FloorTiles.Count; y++)
+				for (int y = x+1; y < model.Count; y++)
 				{
-					//distances[x][y] = 
+					var xCoord = model.IndexToCoordinate(x);
+					var yCoord = model.IndexToCoordinate(y);
+					var distance = Vector2.Distance(xCoord,yCoord);
+					distances[y][x] = distances[x][y] = distance;
 				}
 			}
 		}
 
-
-		/*public bool TryFindPath(int start, int destination)
+		public bool TryFindPath(int start, int destination, out List<int> path, out int pathCost)
 		{
-		}*/
+			Debug.Log($"Find Path {start} => {destination}");
+			int[] previous = new int[model.Count];
+			int[] bestCost = new int[model.Count];
+			float[] distance = distances[destination].values;
+
+			for (int i = 0; i < model.Count; i++)
+			{
+				bestCost[i] = int.MaxValue;
+				previous[i] = -1;
+			}
+			
+			PriorityQueue<int> next = new MinPriorityQueue<int>(model.Count);
+			bestCost[start] = 0;
+			next.Enqueue(0, start);
+
+			int closestIndex = start;
+			
+			while (next.Count > 0)
+			{
+				var (cost, index) = next.Dequeue();
+
+				if (index == destination)
+				{
+					closestIndex = index;
+					//Debug.Log("FOUND");
+					break;
+				}
+				
+				var neighbours = adjacencies[index];
+
+				//Debug.Log($"{index} neighbours {neighbours.values.Count}");
+				foreach (int neighbour in neighbours)
+				{
+					var dist = distance[neighbour];
+					var nCost = cost + 1 + (int)(dist);
+					if (nCost < bestCost[neighbour])
+					{
+						if (dist < distance[closestIndex])
+						{
+							closestIndex = neighbour;
+						}
+						else
+						{
+							Debug.Log($"[{neighbour}]:{dist}>{closestIndex}:{distance[closestIndex]}");
+						}
+						
+						bestCost[neighbour] = nCost;
+						previous[neighbour] = index;
+						next.Enqueue(nCost, neighbour);
+					}
+				}
+			}
+
+
+			path = new List<int>();
+			bool success = closestIndex == destination;
+
+			if (closestIndex != -1)
+			{
+				Debug.Log($"Backtrack Start {closestIndex}");
+				pathCost = bestCost[closestIndex];
+
+				while (closestIndex != -1)
+				{
+					Debug.Log($"BTrack {closestIndex}");
+					path.Add(closestIndex);
+					closestIndex = previous[closestIndex];
+				}
+			}
+			else
+			{
+				pathCost = -1;
+			}
+			return success;
+		}
 		
+		
+	
 		[System.Serializable]
 		public class Neighbours : IEnumerable<int>
 		{
@@ -204,6 +347,7 @@ namespace Controllers
 		public class Distances
 		{
 			public float[] values;
+
 			public Distances(int count)
 			{
 				values = new float[count];
@@ -212,7 +356,7 @@ namespace Controllers
 			public float this[int i]
 			{
 				get => values[i];
-				set { throw new NotImplementedException(); }
+				set => values[i] = value;
 			}
 		}
 	}
