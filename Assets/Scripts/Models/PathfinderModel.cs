@@ -46,11 +46,12 @@ namespace Models
 				values = toArray;
 			}
 
-			public IEnumerator<int> GetEnumerator() => (IEnumerator<int>)values.GetEnumerator();
-			IEnumerator IEnumerable.GetEnumerator()
+			public IEnumerator<int> GetEnumerator()
 			{
-				return values.GetEnumerator();
+				foreach (int value in values)
+					yield return value;
 			}
+			IEnumerator IEnumerable.GetEnumerator() => values.GetEnumerator();
 
 			public static implicit operator int[](Neighbours neighbours) => neighbours.values;
 		}

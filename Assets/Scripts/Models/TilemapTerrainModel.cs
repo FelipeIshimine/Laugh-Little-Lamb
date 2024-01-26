@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Models
@@ -20,10 +19,11 @@ namespace Models
 			this.content = content;
 		}
 
-		public bool IsFloor(int neighbour) => floorTiles.Contains(neighbour);
+		public bool IsFloor(int index) => floorTiles.Contains(index);
+		
 		public int Count => bounds.size.x * bounds.size.y;
-		[Button] public int CoordinateToIndex(Vector2Int coordinate) => coordinate.x - bounds.x + (coordinate.y - bounds.y) * bounds.size.x;
-		[Button] public Vector2Int IndexToCoordinate(int index) => new Vector2Int(index % bounds.size.x, index / bounds.size.x) + new Vector2Int(bounds.min.x,bounds.min.y);
+		public int CoordinateToIndex(Vector2Int coordinate) => coordinate.x - bounds.x + (coordinate.y - bounds.y) * bounds.size.x;
+		public Vector2Int IndexToCoordinate(int index) => new Vector2Int(index % bounds.size.x, index / bounds.size.x) + new Vector2Int(bounds.min.x,bounds.min.y);
 		public IEnumerable<int> GetNeighbours(int index)
 		{
 			var center = IndexToCoordinate(index);
@@ -51,5 +51,7 @@ namespace Models
 				yield return CoordinateToIndex(center + Vector2Int.down);
 			}
 		}
+
+		public TileContent GetContent(int index) => content[index];
 	}
 }

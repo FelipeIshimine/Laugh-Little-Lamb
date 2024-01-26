@@ -13,29 +13,24 @@ namespace Controllers
 	{
 		private static readonly TileBase[] AllTiles = new TileBase[1024];
 
-		[SerializeField] public TilemapTerrainModel tilemapModel;
+		[SerializeField, FoldoutGroup("Component")] private Transform from;
+		[SerializeField, FoldoutGroup("Component")] private Transform to;
 
-		[SerializeField] private Transform from;
-		[SerializeField] private Transform to;
+		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> floorTiles;
+		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> wallTiles;
+		[SerializeField, FoldoutGroup("Tiles")] private Tile playerTile;
+		[SerializeField, FoldoutGroup("Tiles")] private Tile enemyTile;
+		[SerializeField, FoldoutGroup("Tiles")] private Tile exitTile;
+		
+		[SerializeField, FoldoutGroup("Tiles")] private Tilemap terrainTilemap;
+		[SerializeField, FoldoutGroup("Tiles")] private Tilemap contentTilemap;
 
-		[SerializeField] private List<Tile> floorTiles;
-		[SerializeField] private List<Tile> wallTiles;
-
-		[SerializeField] private Tile playerTile;
-		[SerializeField] private Tile enemyTile;
-		[SerializeField] private Tile exitTile;
-
-		[FormerlySerializedAs("tilemap"),SerializeField] private Tilemap terrainTilemap;
-
-		[SerializeField] private Tilemap contentTilemap;
-
-		[SerializeField] private PathfinderModel pathfinderModel;
-
-		[SerializeField] private List<int> path;
-
-		[SerializeField] private int debugNeighbours = 0;
-
-		[SerializeField] private DebugModes debugModes;
+		[SerializeField, BoxGroup("Models")] private PathfinderModel pathfinderModel;
+		[SerializeField, BoxGroup("Models")] public TilemapTerrainModel tilemapModel;
+		
+		[SerializeField, FoldoutGroup("Debug")] private List<int> path;
+		[SerializeField, FoldoutGroup("Debug")] private int debugNeighbours = 0;
+		[SerializeField, FoldoutGroup("Debug")] private DebugModes debugModes;
 
 		public void Initialize()
 		{
@@ -47,8 +42,8 @@ namespace Controllers
 		{
 			terrainTilemap.CompressBounds();
 	   
-			var count = terrainTilemap.GetTilesBlockNonAlloc(terrainTilemap.cellBounds, AllTiles);
 			var bounds = terrainTilemap.cellBounds;
+			var count = terrainTilemap.GetTilesBlockNonAlloc(bounds, AllTiles);
 			
 			List<int> floor = new List<int>(count);
 			for (var index = 0; index < count; index++)
@@ -60,15 +55,12 @@ namespace Controllers
 				}
 			}
 
+			contentTilemap.GetTilesBlockNonAlloc(bounds, AllTiles);
 			TileContent[] content = new TileContent[count];
 			for (var index = 0; index < count; index++)
 			{
 				var tile = AllTiles[index];
-				if (wallTiles.Contains((Tile)tile))
-				{
-					content[index] = TileContent.Wall;
-				}
-				else if (tile == enemyTile)
+				if (tile == enemyTile)
 				{
 					content[index] = TileContent.Enemy;
 				}
@@ -99,6 +91,7 @@ namespace Controllers
 				tilemapModel.IndexToCoordinate(fromIndex), 
 				tilemapModel.IndexToCoordinate(toIndex));
 
+		[Button] public TileContent GetContent(int index) => tilemapModel.GetContent(index);
 
 		private void OnDrawGizmos()
 		{
