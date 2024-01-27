@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Models;
@@ -27,6 +28,9 @@ namespace Controllers.Entities
 		[ShowInInspector,FoldoutGroup("Models")] private List<TreeEntityModel> treeModels;
         public IReadOnlyList<TreeEntityModel> TreeModels => treeModels;
 
+        [SerializeField, FoldoutGroup("Animation")] private float animMoveSpeed = 3; 
+        [SerializeField, FoldoutGroup("Animation")] private AnimationCurve animMoveCurve = AnimationCurve.EaseInOut(0,0,1,1); 
+        
 		private Dictionary<EntityModel, EntityView> modelToView = new Dictionary<EntityModel, EntityView>();
 
 		private TilemapController tilemapController;
@@ -107,11 +111,25 @@ namespace Controllers.Entities
 				else
 				{
 					view.gameObject.SetActive(true);
-					view.transform.position = GetWorldPosition(position);
+					
+					animationSystem.Play(MoveAnimation(view,GetWorldPosition(position)), view);
+					//view.transform.position = GetWorldPosition(position);
 				}
 			}
 			
-			//TODO add animationsystem
+		}
+
+		private IEnumerator MoveAnimation(EntityView view, Vector3 endPosition)
+		{
+			var startPosition = view.transform.position;
+			float t = 0;
+			float duration = Vector2.Distance(startPosition, endPosition) / animMoveSpeed; 
+			do
+			{
+				t += Time.deltaTime / duration;
+				view.transform.position = Vector3.LerpUnclamped(startPosition,endPosition,animMoveCurve.Evaluate(t));
+				yield return null;
+			} while (t<1);
 		}
 
 		private Vector3 GetWorldPosition(int positionIndex) => tilemapController.GetWorldPosition(positionIndex);
@@ -212,34 +230,5 @@ namespace Controllers.Entities
 
 		public void RemoveSheep(SheepEntityModel sheepModel) => sheepModels.Remove(sheepModel);
 		public void AddSheep(SheepEntityModel sheepModel) => sheepModels.Add(sheepModel);
-	}
-
-	public class ExitCommand : ICommand
-	{
-		public readonly int StartPosition;
-		public readonly SheepEntityModel SheepModel;
-		public readonly DoorEntityModel Door;
-		public readonly TilemapModel Model;
-		public readonly EntitiesController entitiesController;
-		public ExitCommand(SheepEntityModel sheep, DoorEntityModel door, TilemapModel model, EntitiesController entitiesController)
-		{
-			this.entitiesController = entitiesController;
-			Door = door;
-			Model = model;
-			StartPosition = sheep.PositionIndex;
-			SheepModel = sheep;
-		}
-
-		public void Do()
-		{
-			Model.RemoveEntity(SheepModel);
-			entitiesController.RemoveSheep(SheepModel);
-		}
-
-		public void Undo()
-		{
-			entitiesController.AddSheep(SheepModel);
-			Model.AddEntity(SheepModel, StartPosition);
-		}
 	}
 }

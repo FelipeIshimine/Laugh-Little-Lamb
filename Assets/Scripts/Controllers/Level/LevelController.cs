@@ -83,7 +83,7 @@ namespace Controllers.Level
 					await player.TakeTurnAsync(token);
 					while (animationSystem.IsPlaying)
 					{
-						Debug.Log("Waiting for AnimationSystem");
+						//Debug.Log("Waiting for AnimationSystem");
 						await Task.Yield();
 					}
 				}
