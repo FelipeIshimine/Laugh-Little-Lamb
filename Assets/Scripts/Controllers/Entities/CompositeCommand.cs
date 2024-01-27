@@ -21,7 +21,7 @@
 		{
 			for (int i = Commands.Length - 1; i >= 0; i--)
 			{
-				Commands[i].Do();
+				Commands[i].Undo();
 			}
 		}
 	}
