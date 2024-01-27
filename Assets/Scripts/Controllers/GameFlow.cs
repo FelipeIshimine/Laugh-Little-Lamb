@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using View;
 
 namespace Controllers
 {
@@ -22,9 +21,6 @@ namespace Controllers
 			await Addressables.LoadSceneAsync(levelScene).Task;
 		
 			var levelController = FindFirstObjectByType<LevelController>();
-			
-			
-
 
 		}
 	}

@@ -3,15 +3,28 @@ using UnityEngine;
 
 namespace Models
 {
-	public struct EntityModel
+	[System.Serializable]
+	public abstract class EntityModel : DataModel<EntityModel>
 	{
-		public Vector2Int Coordinate;
-		public Orientation LookDirection;
-
-		public EntityModel(Vector2Int coordinate, Orientation lookDirection)
+		public event Action<EntityModel,int> OnPositionChange;
+		private int positionIndex;
+		public int PositionIndex
 		{
-			Coordinate = coordinate;
-			LookDirection = lookDirection;
+			get => positionIndex;
+			internal set
+			{
+				if (positionIndex != value)
+				{
+					positionIndex = value;
+					OnPositionChange?.Invoke(this, value);
+				}
+			}
+		}
+		protected EntityModel(int index)
+		{
+			positionIndex = index;
 		}
 	}
 }
+
+

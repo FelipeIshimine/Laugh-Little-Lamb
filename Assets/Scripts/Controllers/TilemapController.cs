@@ -4,7 +4,6 @@ using System.Linq;
 using Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace Controllers
@@ -17,7 +16,6 @@ namespace Controllers
 		[SerializeField, FoldoutGroup("Component")] private Transform to;
 
 		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> floorTiles;
-		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> wallTiles;
 		[SerializeField, FoldoutGroup("Tiles")] private Tile playerTile;
 		[SerializeField, FoldoutGroup("Tiles")] private Tile enemyTile;
 		[SerializeField, FoldoutGroup("Tiles")] private Tile exitTile;
@@ -26,19 +24,14 @@ namespace Controllers
 		[SerializeField, FoldoutGroup("Tiles")] private Tilemap contentTilemap;
 
 		[SerializeField, BoxGroup("Models")] private PathfinderModel pathfinderModel;
-		[SerializeField, BoxGroup("Models")] public TilemapTerrainModel tilemapModel;
+		[SerializeField, BoxGroup("Models")] private TilemapModel tilemapModel;
 		
 		[SerializeField, FoldoutGroup("Debug")] private List<int> path;
 		[SerializeField, FoldoutGroup("Debug")] private int debugNeighbours = 0;
 		[SerializeField, FoldoutGroup("Debug")] private DebugModes debugModes;
 
-		public void Initialize()
-		{
-			ScanTilemap();
-		}
-
 		[Button]
-		public void ScanTilemap()
+		public TilemapModel ProcessTileMaps()
 		{
 			terrainTilemap.CompressBounds();
 	   
@@ -56,34 +49,37 @@ namespace Controllers
 			}
 
 			contentTilemap.GetTilesBlockNonAlloc(bounds, AllTiles);
-			TileContent[] content = new TileContent[count];
+			EntityModel[] entities = new EntityModel[count];
 			for (var index = 0; index < count; index++)
 			{
 				var tile = AllTiles[index];
 				if (tile == enemyTile)
 				{
-					content[index] = TileContent.Enemy;
+					var enemy= new EnemyEntityModel(index);
+					entities[index] = enemy;
 				}
 				else if (tile == playerTile)
 				{
-					content[index] = TileContent.Player;
+					var player = new PlayerEntityModel(index);
+					entities[index] = player;
 				}
 				else if(tile == exitTile)
 				{
-					content[index] = TileContent.Exit;
-				}
-				else
-				{
-					content[index] = TileContent.Empty;
+					var door = new DoorModel(index);
+					entities[index] = door;
 				}
 			}
 			
-			tilemapModel = new TilemapTerrainModel(bounds, floor, content);
 			pathfinderModel = new PathfinderModel(
 				tilemapModel.Count, 
 				index => tilemapModel.GetNeighbours(index).ToArray(),
 				tilemapModel.IsFloor,
 				CalculatedDistance);
+			
+			 tilemapModel = new TilemapModel(bounds, floor, entities);
+
+			 contentTilemap.gameObject.SetActive(false);
+			 return tilemapModel;
 		}
 
 		private float CalculatedDistance(int fromIndex, int toIndex) =>
@@ -91,7 +87,7 @@ namespace Controllers
 				tilemapModel.IndexToCoordinate(fromIndex), 
 				tilemapModel.IndexToCoordinate(toIndex));
 
-		[Button] public TileContent GetContent(int index) => tilemapModel.GetContent(index);
+		[Button] public EntityModel GetContent(int index) => tilemapModel.GetContent(index);
 
 		private void OnDrawGizmos()
 		{
@@ -228,5 +224,8 @@ namespace Controllers
 			Adjacencies = 8,
 			Path = 16
 		}
+
+		public Vector3 GetWorldPosition(int positionIndex) => terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(positionIndex));
+		public Vector3 GetWorldPosition(Vector2Int coordinate) => terrainTilemap.GetCellCenterWorld((Vector3Int)coordinate);
 	}
 }
