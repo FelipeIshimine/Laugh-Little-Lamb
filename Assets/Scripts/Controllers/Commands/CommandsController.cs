@@ -21,6 +21,7 @@ namespace Controllers
 
 		public void Do(ICommand command)
 		{
+			Debug.Log($"DO:{command}");
 			if (redoStack.Count > 0)
 			{
 				redoStack.Clear();
@@ -36,6 +37,7 @@ namespace Controllers
 			{
 				var command = redoStack.Pop();
 				command.Do();
+				Debug.Log($"Redo:{command}");
 				historyStack.Push(command);
 			}
 		}
@@ -46,6 +48,7 @@ namespace Controllers
 			if (historyStack.Count > 0)
 			{
 				var command = historyStack.Pop();
+				Debug.Log($"Undo:{command}");
 				redoStack.Push(command);
 				command.Do();
 			}

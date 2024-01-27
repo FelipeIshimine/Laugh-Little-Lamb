@@ -49,13 +49,11 @@ namespace Controllers.Level
 		
 			sheepsController.Initialize(entitiesController);
 			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController);
-
-			EntityView[] views = new EntityView[entitiesController.SheepEntityModels.Count];
-			for (int i = 0; i < entitiesController.SheepEntityModels.Count; i++)
-			{
-				views[i] = entitiesController.GetView(entitiesController.SheepEntityModels[i]);
-			}
-			cameraController.Initialize(views);
+			
+			cameraController.Initialize(
+				entitiesController.GetSheepViews().ToArray(),
+				entitiesController.GetEnemyViews().ToArray(),
+				entitiesController.GetDoorViews().ToArray());
 		}
 
 		public void Terminate()

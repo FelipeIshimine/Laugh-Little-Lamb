@@ -121,7 +121,7 @@ namespace Controllers.Entities
 			var targetCoordinate = coordinate + direction.ToVector2Int();
 			var targetPosition = tilemapModel.CoordinateToIndex(targetCoordinate);
 			
-			if (tilemapModel.IsEmpty(targetPosition))
+			if (tilemapModel.Contains(targetPosition) && tilemapModel.IsEmpty(targetPosition))
 			{
 				if (entityModel is SheepEntityModel playerEntityModel)
 				{
@@ -154,7 +154,8 @@ namespace Controllers.Entities
 			ICommand[] commands = new ICommand[entityModels.Length];
 			for (int i = 0; i < entityModels.Length; i++)
 			{
-				commands[i]=CreateMoveCommand(entityModels[i], direction[i]);
+				commands[i]= CreateMoveCommand(entityModels[i], direction[i]);
+				Debug.Log(commands[i]);
 			}
 			commandsController.Do(new CompositeCommand(commands.ToArray()));
 			
@@ -171,5 +172,18 @@ namespace Controllers.Entities
 		}
 
 		public EntityView GetView(EntityModel model) => modelToView[model];
+
+		public IEnumerable<EntityView> GetSheepViews() => GetViews(sheepModels);
+		public IEnumerable<EntityView> GetEnemyViews() => GetViews(enemyModels);
+		public IEnumerable<EntityView> GetDoorViews() => GetViews(doorModels);
+
+		public IEnumerable<EntityView> GetViews(IEnumerable<EntityModel> models)
+		{
+			foreach (EntityModel entityModel in models)
+			{
+				yield return modelToView[entityModel];
+			}
+		}
+		
 	}
 }

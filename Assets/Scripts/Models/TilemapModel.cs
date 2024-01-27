@@ -135,5 +135,7 @@ namespace Models
 		}
 
 		public bool IsIlluminated(int index) => illuminatedTiles.Contains(index);
+
+		public bool Contains(int targetPosition) => bounds.Contains((Vector3Int)IndexToCoordinate(targetPosition));
 	}
 }

@@ -123,9 +123,7 @@ namespace Controllers
 					{
 						var coordinate = bounds.min + new Vector3Int(index % bounds.size.x, index / bounds.size.x);
 						var center = terrainTilemap.GetCellCenterWorld(coordinate);
-#if UNITY_EDITOR
-						UnityEditor.Handles.Label(center, $"{coordinate.x},{coordinate.y}");
-#endif
+						DrawLabel(center,$"{coordinate.x},{coordinate.y}");
 					}  
 				}
 
@@ -135,9 +133,19 @@ namespace Controllers
 					{
 						var coordinate = bounds.min + new Vector3Int(index % bounds.size.x, index / bounds.size.x);
 						var center = terrainTilemap.GetCellCenterWorld(coordinate);
-#if UNITY_EDITOR
-						UnityEditor.Handles.Label(center, $"{index}");
-#endif
+						DrawLabel(center,index.ToString());
+					}  
+				}
+				
+				if ((debugModes & DebugModes.Entity) != 0)
+				{
+					for (var index = 0; index < count; index++)
+					{
+						var coordinate = bounds.min + new Vector3Int(index % bounds.size.x, index / bounds.size.x);
+						var center = terrainTilemap.GetCellCenterWorld(coordinate);
+
+						var model = tilemapModel.GetEntity(index);
+						DrawLabel(center, model == null ? "-" : model.GetType().Name);
 					}  
 				}
 
@@ -213,6 +221,13 @@ namespace Controllers
 			}
 		}
 
+		private static void DrawLabel(Vector3 center, string s)
+		{
+#if UNITY_EDITOR
+			UnityEditor.Handles.Label(center, s);
+#endif
+		}
+
 		public bool TryFindPath(int fromIndex, int toIndex, ref List<int> resultPath)
 		{
 			return Pathfinding.AStar.TryFindPath(
@@ -234,7 +249,8 @@ namespace Controllers
 			Coordinates = 2,
 			WalkableTiles = 4,
 			Adjacencies = 8,
-			Path = 16
+			Path = 16,
+			Entity = 32
 		}
 
 		public Vector3 GetWorldPosition(int positionIndex) => terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(positionIndex));

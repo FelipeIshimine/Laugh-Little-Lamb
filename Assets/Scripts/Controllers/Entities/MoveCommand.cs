@@ -15,6 +15,7 @@ namespace Controllers.Entities
 			this.model = model;
 			this.endPosition = endPosition;
 			this.target = target;
+			startPosition = target.PositionIndex;
 		}
 
 		public void Do()
@@ -26,5 +27,7 @@ namespace Controllers.Entities
 		{
 			model.SwapEntities(startPosition,endPosition);
 		}
+
+		public override string ToString() => $"{target.GetType().Name} {startPosition}=>{endPosition}";
 	}
 }
