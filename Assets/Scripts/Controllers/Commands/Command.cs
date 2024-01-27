@@ -31,6 +31,4 @@ namespace Controllers.Commands
 		void Do();
 		void Undo();
 	}
-	
-	
 }

@@ -121,7 +121,9 @@ namespace Controllers.Entities
 				{
 					if (targetEntity is DoorEntityModel door)
 					{
-						return new ExitCommand(sheepEntityModel, door, tilemapModel, this);
+						return new LookMoveAndExitCommand(sheepEntityModel, door,tilemapModel,direction, this);
+						
+						//return new ExitCommand(sheepEntityModel, door, tilemapModel, this);
 					}
 
 					return new MoveAndLookCommand(
