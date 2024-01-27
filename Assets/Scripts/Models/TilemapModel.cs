@@ -8,6 +8,7 @@ namespace Models
 	public class TilemapModel
 	{
 		[SerializeField] private List<int> floorTiles;
+		[SerializeField] private List<int> illuminatedTiles;
 		[SerializeField] private EntityModel[] entities;
 		[SerializeField] private BoundsInt bounds;
 
@@ -18,13 +19,15 @@ namespace Models
 			this.bounds = bounds;
 			this.floorTiles = floorTiles;
 			this.entities = entities;
+			illuminatedTiles = new List<int>();
 		}
 
 		public bool IsFloor(int index) => floorTiles.Contains(index);
-		
+
 		public int Count => bounds.size.x * bounds.size.y;
 		public int CoordinateToIndex(Vector2Int coordinate) => coordinate.x - bounds.x + (coordinate.y - bounds.y) * bounds.size.x;
 		public Vector2Int IndexToCoordinate(int index) => new Vector2Int(index % bounds.size.x, index / bounds.size.x) + new Vector2Int(bounds.min.x,bounds.min.y);
+
 		public IEnumerable<int> GetNeighbours(int index)
 		{
 			var center = IndexToCoordinate(index);
@@ -53,7 +56,9 @@ namespace Models
 			}
 		}
 
-		public EntityModel GetContent(int index) => entities[index];
+
+		public EntityModel GetEntity(int index) => entities[index];
+
 
 		public IEnumerable<EntityModel> GetAllEntities()
 		{
@@ -97,6 +102,7 @@ namespace Models
 
 		public bool IsEmpty(int index) => entities[index] == null;
 
+
 		public void SwapEntities(int startPosition, int endPosition)
 		{
 			(entities[startPosition], entities[endPosition]) = (entities[endPosition], entities[startPosition]);
@@ -113,5 +119,21 @@ namespace Models
 		}
 
 		public bool IsEmpty(Vector2Int targetCoordinate) => IsEmpty(CoordinateToIndex(targetCoordinate));
+
+
+		public void Illuminate(params int[] indexes)
+		{
+			illuminatedTiles.AddRange(indexes);
+		}
+
+		public void Obscure(params int[] indexes)
+		{
+			foreach (int index in indexes)
+			{
+				illuminatedTiles.Remove(index);
+			}
+		}
+
+		public bool IsIlluminated(int index) => illuminatedTiles.Contains(index);
 	}
 }

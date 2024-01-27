@@ -9,11 +9,11 @@ namespace Controllers.Entities
 		public readonly Orientation EndOrientation;
 		public readonly int EndPosition;
 
-		private PlayerEntityModel target;
+		private SheepEntityModel target;
 		private TilemapModel model;
 		
 		public MoveAndLookCommand(
-			PlayerEntityModel target,
+			SheepEntityModel target,
 			TilemapModel model,
 			Orientation endOrientation,
 			int endPosition)

@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Controllers.Entities;
+using Controllers.Player;
 using Cysharp.Threading.Tasks;
 using Models;
 using Sirenix.OdinInspector;
@@ -16,18 +19,21 @@ namespace Controllers.Level
 		[SerializeField] private TilemapController tilemapController;
 		[SerializeField] private CommandsController commandsController;
 		
-		[SerializeField] private PlayerController playerController;
+		[SerializeField] private SheepsController sheepsController;
 		[SerializeField] private EnemyAiController enemyAiController;
 		
 		[SerializeField] private EntitiesController entitiesController;
+		[SerializeField] private CameraController cameraController;
 		[SerializeField] private AnimationSystem animationSystem;
 
 		[SerializeField] private TilemapModel tilemapModel;
 
+		public IPlayer[] players;
 		private async UniTaskVoid Awake()
 		{
 			Initialize(null);
-			await GameLoop();
+			
+			await GameLoop(destroyCancellationToken);
 		}
 
 		[Button]
@@ -41,16 +47,31 @@ namespace Controllers.Level
 			
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController,animationSystem);
 		
-			playerController.Initialize(entitiesController);
+			sheepsController.Initialize(entitiesController);
+			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController);
+
+			EntityView[] views = new EntityView[entitiesController.SheepEntityModels.Count];
+			for (int i = 0; i < entitiesController.SheepEntityModels.Count; i++)
+			{
+				views[i] = entitiesController.GetView(entitiesController.SheepEntityModels[i]);
+			}
+			cameraController.Initialize(views);
 		}
 
 		public void Terminate()
 		{
 			commandsController.Terminate();
+			cameraController.Terminate();
 		}
 
-		public async UniTask GameLoop()
+		public async UniTask GameLoop(CancellationToken token)
 		{
+			players = new IPlayer[]
+			{
+				sheepsController,
+				enemyAiController
+			};
+			
 			while (true)
 			{
 				if (gameObject == null)
@@ -58,12 +79,14 @@ namespace Controllers.Level
 					break;
 				}
 
-				await playerController.TakeTurnAsync();
-
-				while (animationSystem.IsPlaying)
+				foreach (IPlayer player in players)
 				{
-					Debug.Log("Waiting for AnimationSystem");
-					await Task.Yield();
+					await player.TakeTurnAsync(token);
+					while (animationSystem.IsPlaying)
+					{
+						Debug.Log("Waiting for AnimationSystem");
+						await Task.Yield();
+					}
 				}
 			}
 		}

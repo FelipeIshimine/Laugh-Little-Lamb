@@ -57,19 +57,19 @@ namespace Controllers
 				EntityModel model;
 				if (wallTiles.Contains(tile))
 				{
-					model = new TreeModel(index);
+					model = new TreeEntityModel(index);
 				}
-				if (tile == enemyTile)
+				else if (tile == enemyTile)
 				{
 					model = new EnemyEntityModel(index);
 				}
 				else if (tile == playerTile)
 				{
-					model = new PlayerEntityModel(index);
+					model = new SheepEntityModel(index);
 				}
 				else if(tile == exitTile)
 				{
-					model = new DoorModel(index);
+					model = new DoorEntityModel(index);
 				}
 				else
 				{
@@ -84,6 +84,7 @@ namespace Controllers
 				tilemapModel.Count, 
 				index => tilemapModel.GetNeighbours(index).ToArray(),
 				IsWalkable,
+				x=> 1,
 				CalculatedDistance);
 			
 			 contentTilemap.gameObject.SetActive(false);
@@ -97,7 +98,7 @@ namespace Controllers
 				tilemapModel.IndexToCoordinate(fromIndex), 
 				tilemapModel.IndexToCoordinate(toIndex));
 
-		[Button] public EntityModel GetContent(int index) => tilemapModel.GetContent(index);
+		[Button] public EntityModel GetContent(int index) => tilemapModel.GetEntity(index);
 
 		private void OnDrawGizmos()
 		{
@@ -159,12 +160,12 @@ namespace Controllers
 					var color = new Color(1,1,1,1f);
 					Gizmos.color = color;
 
-					for (var index = 0; index < pathfinderModel.adjacencies.Length; index++)
+					for (var index = 0; index < pathfinderModel.Adjacencies.Count; index++)
 					{
 						var coordinate = tilemapModel.IndexToCoordinate(index);
 						var worldPos = terrainTilemap.GetCellCenterWorld(coordinate);
 
-						var neighbours = pathfinderModel.adjacencies[index];
+						var neighbours = pathfinderModel.Adjacencies[index];
 
 						foreach (int neighbour in neighbours)
 						{
@@ -200,11 +201,11 @@ namespace Controllers
 				}
 			}
 
-			if (debugNeighbours >= 0 && debugNeighbours < pathfinderModel.adjacencies.Length)
+			if (debugNeighbours >= 0 && debugNeighbours < pathfinderModel.Adjacencies.Count)
 			{
 				Gizmos.color = Color.cyan;
 				var center = terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(debugNeighbours));
-				foreach (var neighbour in pathfinderModel.adjacencies[debugNeighbours])
+				foreach (var neighbour in pathfinderModel.Adjacencies[debugNeighbours])
 				{
 					var other =terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(neighbour));
 					Gizmos.DrawLine(center, other);
@@ -216,11 +217,12 @@ namespace Controllers
 		{
 			return Pathfinding.AStar.TryFindPath(
 				fromIndex, 
-				toIndex, 
+				toIndex,
+				tilemapModel.IsEmpty,
 				pathfinderModel.GetNeighbours,
-				x => pathfinderModel.distances[toIndex][x],
+				x => pathfinderModel.GetDistance(toIndex,x),
 				tilemapModel.Count,
-				ref resultPath, 
+				ref resultPath,		
 				out _);
 		}
 

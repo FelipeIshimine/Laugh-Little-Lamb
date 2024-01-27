@@ -6,9 +6,9 @@ namespace Controllers.Entities
 	{
 		private readonly Orientation startOrientation;
 		private readonly Orientation endOrientation;
-		private PlayerEntityModel target;
+		private SheepEntityModel target;
 
-		public LookCommand(PlayerEntityModel target, Orientation endOrientation)
+		public LookCommand(SheepEntityModel target, Orientation endOrientation)
 		{
 			startOrientation = target.LookDirection;
 			this.endOrientation = endOrientation;

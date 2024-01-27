@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Model;
 using Models;
 using Sirenix.OdinInspector;
@@ -11,17 +12,21 @@ namespace Controllers.Entities
 	public class EntitiesController : MonoBehaviour
 	{
 		private CommandsController commandsController;
-		
-		[ShowInInspector] private TilemapModel tilemapModel;
-		[ShowInInspector] private List<PlayerEntityModel> playerModels;
-		[ShowInInspector] private List<EnemyEntityModel> enemyModels;
-		[ShowInInspector] private List<DoorModel> doorModels;
-		[ShowInInspector] private List<TreeModel> treeModels;
 
-		[SerializeField] private EnemyEntityView enemyViewPrefab;
-		[SerializeField] private PlayerEntityView playerViewPrefab;
-		[SerializeField] private DoorEntityView doorViewPrefab;
-		[SerializeField] private TreeEntityView treeViewPrefab;
+		[SerializeField,FoldoutGroup("Prefabs")] private EnemyEntityView enemyViewPrefab;
+		[SerializeField,FoldoutGroup("Prefabs")] private SheepEntityView sheepViewPrefab;
+		[SerializeField,FoldoutGroup("Prefabs")] private DoorEntityView doorViewPrefab;
+		[SerializeField,FoldoutGroup("Prefabs")] private TreeEntityView treeViewPrefab;
+		
+		[ShowInInspector,FoldoutGroup("Models")] private TilemapModel tilemapModel;
+		[ShowInInspector,FoldoutGroup("Models")] private List<SheepEntityModel> sheepModels;
+        public IReadOnlyList<SheepEntityModel> SheepEntityModels => sheepModels;
+		[ShowInInspector,FoldoutGroup("Models")] private List<EnemyEntityModel> enemyModels;
+        public IReadOnlyList<EnemyEntityModel> EnemyEntityModels => enemyModels;
+		[ShowInInspector,FoldoutGroup("Models")] private List<DoorEntityModel> doorModels;
+        public IReadOnlyList<DoorEntityModel> DoorModels => doorModels;
+		[ShowInInspector,FoldoutGroup("Models")] private List<TreeEntityModel> treeModels;
+        public IReadOnlyList<TreeEntityModel> TreeModels => treeModels;
 
 		private Dictionary<EntityModel, EntityView> modelToView = new Dictionary<EntityModel, EntityView>();
 
@@ -37,17 +42,17 @@ namespace Controllers.Entities
 			tilemapModel = model;
 			
 			enemyModels = new List<EnemyEntityModel>();
-			playerModels = new List<PlayerEntityModel>();
-			doorModels = new List<DoorModel>();
-			treeModels = new List<TreeModel>();
+			sheepModels = new List<SheepEntityModel>();
+			doorModels = new List<DoorEntityModel>();
+			treeModels = new List<TreeEntityModel>();
 			
 			foreach (var entity in model.GetAllEntities())
 			{
-				if (entity is TreeModel treeModel)
+				if (entity is TreeEntityModel treeModel)
 				{
 					treeModels.Add(treeModel);
 					var view = Instantiate(
-						enemyViewPrefab,
+						treeViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
 						Quaternion.identity);
 					modelToView.Add(entity, view);
@@ -61,17 +66,21 @@ namespace Controllers.Entities
 						Quaternion.identity);
 					modelToView.Add(entity, view);
 				}
-				else if (entity is PlayerEntityModel playerModel)
+				else if (entity is SheepEntityModel playerModel)
 				{
-					playerModels.Add(playerModel);
+					sheepModels.Add(playerModel);
 					var view = Instantiate(
-						playerViewPrefab,
+						sheepViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
 						Quaternion.identity);
-					playerModel.LookDirection.OnUpdate += x => view.SetLookDirection((int)x);
+					playerModel.LookDirection.OnUpdate += x =>
+					{
+						if(x != Orientation.None)
+						{view.SetLookDirection((int)x - 1);}
+					};
 					modelToView.Add(entity, view);
 				}
-				else if (entity is DoorModel door)
+				else if (entity is DoorEntityModel door)
 				{
 					doorModels.Add(door);
 					var view = Instantiate(
@@ -86,10 +95,12 @@ namespace Controllers.Entities
 			}
 		}
 
-		private void EntityPositionChanged<T>(T entity, int position) where T : EntityModel<T>
+		private void EntityPositionChanged(ITileEntity tileEntity, int position)
 		{
-			modelToView[entity].transform.position = GetWorldPosition(position);
-			
+			if (tileEntity is EntityModel model)
+			{
+				modelToView[model].transform.position = GetWorldPosition(position);
+			}
 			
 			//TODO add animationsystem
 		}
@@ -97,16 +108,22 @@ namespace Controllers.Entities
 		private Vector3 GetWorldPosition(int positionIndex) => tilemapController.GetWorldPosition(positionIndex);
 		private Vector3 GetWorldPosition(Vector2Int coordinate) => tilemapController.GetWorldPosition(coordinate);
 		
-		public ICommand CreateMoveCommand<T>(T entityModel, Orientation direction) where T : EntityModel<T>, IMove
+		public ICommand CreateMoveCommand(EntityModel entityModel, Orientation direction)
 		{
 			Debug.Log($"MOVE:{entityModel} {direction}");
 			var coordinate = tilemapModel.IndexToCoordinate(entityModel.PositionIndex);
+
+			if (direction == Orientation.None)
+			{
+				return new WaitCommand();
+			}
+			
 			var targetCoordinate = coordinate + direction.ToVector2Int();
 			var targetPosition = tilemapModel.CoordinateToIndex(targetCoordinate);
 			
 			if (tilemapModel.IsEmpty(targetPosition))
 			{
-				if (entityModel is PlayerEntityModel playerEntityModel)
+				if (entityModel is SheepEntityModel playerEntityModel)
 				{
 					return new MoveAndLookCommand(
 							playerEntityModel,
@@ -121,7 +138,7 @@ namespace Controllers.Entities
 			}
 			else
 			{
-				if (entityModel is PlayerEntityModel playerEntityModel)
+				if (entityModel is SheepEntityModel playerEntityModel)
 				{
 					return new LookCommand(
 						playerEntityModel,
@@ -131,19 +148,28 @@ namespace Controllers.Entities
 			}
 		}
 
-		public void MoveTogether<T>(T[] entityModels, Orientation direction) where T : EntityModel<T>, IMove
+
+		public void MoveTogether<T>(T[] entityModels, Orientation[] direction) where T : EntityModel, IMove
 		{
-			CompositeCommand command = new CompositeCommand(
-				Array.ConvertAll(entityModels, x => CreateMoveCommand(x, direction)));
+			ICommand[] commands = new ICommand[entityModels.Length];
+			for (int i = 0; i < entityModels.Length; i++)
+			{
+				commands[i]=CreateMoveCommand(entityModels[i], direction[i]);
+			}
+			commandsController.Do(new CompositeCommand(commands.ToArray()));
+			
+		}
+		public void MoveTogether<T>(IEnumerable<T> entityModels, Orientation direction) where T : EntityModel, IMove
+		{
+			MoveTogether<T>(Array.ConvertAll(entityModels.ToArray(),x=>(x,direction)));
 		}
 		
-		/*public void MovePlayers(Orientation result)
+		public void MoveTogether<T>(IEnumerable<(T Entity, Orientation Direction)> values) where T : EntityModel, IMove
 		{
-			Debug.Log("MOVE PLAYERS");
-			foreach (PlayerEntityModel model in playerModels)
-			{
-				CreateMoveCommand(model,result);
-			}
-		}*/
+			CompositeCommand command = new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateMoveCommand(x.Entity, x.Direction)));
+			commandsController.Do(command);
+		}
+
+		public EntityView GetView(EntityModel model) => modelToView[model];
 	}
 }

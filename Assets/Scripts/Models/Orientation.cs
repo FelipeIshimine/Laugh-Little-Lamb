@@ -6,10 +6,11 @@ namespace Models
 	[System.Serializable]
 	public enum Orientation
 	{
-		Up = 0,
-		Right = 1,
-		Down = 2,
-		Left = 3
+		None = 0,
+		Up = 1,
+		Right = 2,
+		Down = 3,
+		Left = 4
 	}
 
 	public static class OrientationExtensions
@@ -18,6 +19,8 @@ namespace Models
 		{
 			switch (@this)
 			{
+				case Orientation.None:
+					return Vector2Int.zero;
 				case Orientation.Up:
 					return Vector2Int.up;
 				case Orientation.Right:
