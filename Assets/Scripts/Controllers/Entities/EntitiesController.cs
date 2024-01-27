@@ -102,7 +102,7 @@ namespace Controllers.Entities
 		
 		public ICommand CreateCommand(EntityModel entityModel, Orientation direction)
 		{
-			Debug.Log($"CreateCommand:{entityModel} {direction}");
+			//Debug.Log($"CreateCommand:{entityModel} {direction}");
 			var coordinate = tilemapModel.IndexToCoordinate(entityModel.PositionIndex);
 
 			if (direction == Orientation.None)

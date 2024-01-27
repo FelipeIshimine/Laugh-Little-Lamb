@@ -43,7 +43,7 @@ namespace Controllers.CommandAnimations
 
 		protected void OnDoCommand(MoveCommand command)
 		{
-			Debug.Log($"OnCommand:{command}");
+			//Debug.Log($"OnCommand:{command}");
 			var view = ModelToView[command.EntityModel];
 			var position = command.EndPosition;
 			var otherEntityModel = command.TilemapModel.GetEntity(position);
@@ -60,7 +60,7 @@ namespace Controllers.CommandAnimations
 
 		private IEnumerator MoveAnimation(EntityView view, Vector3 endPosition)
 		{
-			Debug.Log($"MoveAnimation:{view.name} {endPosition}");
+			//Debug.Log($"MoveAnimation:{view.name} {endPosition}");
 			view.gameObject.SetActive(true);
 			var startPosition = view.transform.position;
 			
