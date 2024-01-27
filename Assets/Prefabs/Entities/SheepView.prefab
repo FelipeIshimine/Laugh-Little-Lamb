@@ -50,12 +50,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3877841175310950318, guid: 8308c698f48c09a419918c8b9ebb173d, type: 3}
       propertyPath: m_Name
-      value: PlayerView
+      value: SheepView
       objectReference: {fileID: 0}
     - target: {fileID: 7869178279990298191, guid: 8308c698f48c09a419918c8b9ebb173d, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: ce301d257d68c8a44a85959dc68b532b, type: 3}
+    - target: {fileID: 7869178279990298191, guid: 8308c698f48c09a419918c8b9ebb173d, type: 3}
+      propertyPath: m_Color.b
+      value: 0.6556604
+      objectReference: {fileID: 0}
+    - target: {fileID: 7869178279990298191, guid: 8308c698f48c09a419918c8b9ebb173d, type: 3}
+      propertyPath: m_Color.g
+      value: 0.9041362
+      objectReference: {fileID: 0}
     - target: {fileID: 7869178279990298191, guid: 8308c698f48c09a419918c8b9ebb173d, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1

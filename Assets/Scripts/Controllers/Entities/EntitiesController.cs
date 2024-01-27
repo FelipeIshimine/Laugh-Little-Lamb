@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Model;
 using Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -99,7 +98,17 @@ namespace Controllers.Entities
 		{
 			if (tileEntity is EntityModel model)
 			{
-				modelToView[model].transform.position = GetWorldPosition(position);
+				var view = modelToView[model];
+				if (position == -1)
+				{
+					Debug.Log($"{tileEntity} Removed from Tilemap");
+					view.gameObject.SetActive(false);
+				}
+				else
+				{
+					view.gameObject.SetActive(true);
+					view.transform.position = GetWorldPosition(position);
+				}
 			}
 			
 			//TODO add animationsystem
@@ -108,7 +117,7 @@ namespace Controllers.Entities
 		private Vector3 GetWorldPosition(int positionIndex) => tilemapController.GetWorldPosition(positionIndex);
 		private Vector3 GetWorldPosition(Vector2Int coordinate) => tilemapController.GetWorldPosition(coordinate);
 		
-		public ICommand CreateMoveCommand(EntityModel entityModel, Orientation direction)
+		public ICommand CreateCommand(EntityModel entityModel, Orientation direction)
 		{
 			Debug.Log($"MOVE:{entityModel} {direction}");
 			var coordinate = tilemapModel.IndexToCoordinate(entityModel.PositionIndex);
@@ -121,15 +130,22 @@ namespace Controllers.Entities
 			var targetCoordinate = coordinate + direction.ToVector2Int();
 			var targetPosition = tilemapModel.CoordinateToIndex(targetCoordinate);
 			
-			if (tilemapModel.Contains(targetPosition) && tilemapModel.IsEmpty(targetPosition))
+			if (tilemapModel.Contains(targetPosition) && CanWalk(entityModel,targetPosition))
 			{
+				var targetEntity = tilemapModel.GetEntity(targetPosition);
+				
 				if (entityModel is SheepEntityModel playerEntityModel)
 				{
+					if (targetEntity is DoorEntityModel door)
+					{
+						return new ExitCommand(playerEntityModel, door, tilemapModel, this);
+					}
+
 					return new MoveAndLookCommand(
-							playerEntityModel,
-							tilemapModel,
-							direction,
-							targetPosition);
+						playerEntityModel,
+						tilemapModel,
+						direction,
+						targetPosition);
 				}
 				return new MoveCommand(
 					entityModel,
@@ -148,13 +164,22 @@ namespace Controllers.Entities
 			}
 		}
 
+		private bool CanWalk(EntityModel entityModel, int targetPosition)
+		{
+			var targetEntity = tilemapModel.GetEntity(targetPosition);
+			if (entityModel is SheepEntityModel sheep && targetEntity is DoorEntityModel doorEntityModel)
+			{
+				return true;
+			}
+			return tilemapModel.IsEmpty(targetPosition);
+		}
 
 		public void MoveTogether<T>(T[] entityModels, Orientation[] direction) where T : EntityModel, IMove
 		{
 			ICommand[] commands = new ICommand[entityModels.Length];
 			for (int i = 0; i < entityModels.Length; i++)
 			{
-				commands[i]= CreateMoveCommand(entityModels[i], direction[i]);
+				commands[i]= CreateCommand(entityModels[i], direction[i]);
 				Debug.Log(commands[i]);
 			}
 			commandsController.Do(new CompositeCommand(commands.ToArray()));
@@ -167,7 +192,7 @@ namespace Controllers.Entities
 		
 		public void MoveTogether<T>(IEnumerable<(T Entity, Orientation Direction)> values) where T : EntityModel, IMove
 		{
-			CompositeCommand command = new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateMoveCommand(x.Entity, x.Direction)));
+			CompositeCommand command = new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateCommand(x.Entity, x.Direction)));
 			commandsController.Do(command);
 		}
 
@@ -184,6 +209,37 @@ namespace Controllers.Entities
 				yield return modelToView[entityModel];
 			}
 		}
-		
+
+		public void RemoveSheep(SheepEntityModel sheepModel) => sheepModels.Remove(sheepModel);
+		public void AddSheep(SheepEntityModel sheepModel) => sheepModels.Add(sheepModel);
+	}
+
+	public class ExitCommand : ICommand
+	{
+		public readonly int StartPosition;
+		public readonly SheepEntityModel SheepModel;
+		public readonly DoorEntityModel Door;
+		public readonly TilemapModel Model;
+		public readonly EntitiesController entitiesController;
+		public ExitCommand(SheepEntityModel sheep, DoorEntityModel door, TilemapModel model, EntitiesController entitiesController)
+		{
+			this.entitiesController = entitiesController;
+			Door = door;
+			Model = model;
+			StartPosition = sheep.PositionIndex;
+			SheepModel = sheep;
+		}
+
+		public void Do()
+		{
+			Model.RemoveEntity(SheepModel);
+			entitiesController.RemoveSheep(SheepModel);
+		}
+
+		public void Undo()
+		{
+			entitiesController.AddSheep(SheepModel);
+			Model.AddEntity(SheepModel, StartPosition);
+		}
 	}
 }

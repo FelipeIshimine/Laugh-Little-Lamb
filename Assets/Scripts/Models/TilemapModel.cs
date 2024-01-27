@@ -100,6 +100,12 @@ namespace Models
 			entityModel.PositionIndex = -1;
 		}
 
+		public void AddEntity(SheepEntityModel entityModel, int startPosition)
+		{
+			entities[startPosition] = entityModel;
+			entityModel.PositionIndex = startPosition;
+		}
+		
 		public bool IsEmpty(int index) => entities[index] == null;
 
 
@@ -137,5 +143,7 @@ namespace Models
 		public bool IsIlluminated(int index) => illuminatedTiles.Contains(index);
 
 		public bool Contains(int targetPosition) => bounds.Contains((Vector3Int)IndexToCoordinate(targetPosition));
+
+	
 	}
 }
