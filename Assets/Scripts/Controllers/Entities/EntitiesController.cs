@@ -111,8 +111,15 @@ namespace Controllers.Entities
 				else
 				{
 					view.gameObject.SetActive(true);
-					
-					animationSystem.Play(MoveAnimation(view,GetWorldPosition(position)), view);
+					var otherEntityModel = tilemapModel.GetEntity(position);
+					if (otherEntityModel != null)
+					{
+						animationSystem.Play(MoveAnimation(view,GetWorldPosition(position)), model, position, otherEntityModel);
+					}
+					else
+					{
+						animationSystem.Play(MoveAnimation(view,GetWorldPosition(position)), model, position);
+					}
 					//view.transform.position = GetWorldPosition(position);
 				}
 			}
@@ -213,6 +220,8 @@ namespace Controllers.Entities
 			CompositeCommand command = new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateCommand(x.Entity, x.Direction)));
 			commandsController.Do(command);
 		}
+		
+		public void Move(EntityModel model, Orientation moveDirection) => commandsController.Do(CreateCommand(model, moveDirection));
 
 		public EntityView GetView(EntityModel model) => modelToView[model];
 
@@ -230,5 +239,7 @@ namespace Controllers.Entities
 
 		public void RemoveSheep(SheepEntityModel sheepModel) => sheepModels.Remove(sheepModel);
 		public void AddSheep(SheepEntityModel sheepModel) => sheepModels.Add(sheepModel);
+
+		
 	}
 }

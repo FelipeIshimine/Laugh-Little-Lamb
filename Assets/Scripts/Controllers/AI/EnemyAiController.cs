@@ -62,24 +62,26 @@ namespace Controllers.AI
 
 		public UniTask TakeTurnAsync(CancellationToken token)
 		{
-			for (int move = 0; move < moveSpeed; move++)
+			int[] targetPositions = new int[sheeps.Count];
+			for (var index = 0; index < sheeps.Count; index++)
 			{
-				int[] targetPositions = new int[sheeps.Count];
-				for (var index = 0; index < sheeps.Count; index++)
-				{
-					targetPositions[index] = sheeps[index].PositionIndex;
-				}
+				targetPositions[index] = sheeps[index].PositionIndex;
+			}
 
-				Orientation[] moveDirections = new Orientation[enemies.Count];
-				for (var i = 0; i < enemies.Count; i++)
+			//Orientation[] moveDirections = new Orientation[enemies.Count];
+			for (var i = 0; i < enemies.Count; i++)
+			{
+				for (int move = 0; move < moveSpeed; move++)
 				{
 					normalPathfinder.CalculateAdjacencies();
 					normalPathfinder.CalculateCosts();
+					Orientation moveDirection;
 
+					var enemyIndex = i;
 					bool IsWalkable(int index)
 					{
 						var entity = tilemapModel.GetEntity(index);
-						return entity == null || entity is SheepEntityModel || entity == enemies[i];
+						return entity == null || entity is SheepEntityModel || entity == enemies[enemyIndex];
 					}
 
 					var enemyEntityModel = enemies[i];
@@ -109,21 +111,21 @@ namespace Controllers.AI
 
 						Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
 						var offset = tilemapModel.IndexToCoordinate(path[1]) - tilemapModel.IndexToCoordinate(path[0]);
-						moveDirections[i] = OffsetToOrientation(offset);
+						moveDirection = OffsetToOrientation(offset);
 					}
 					else
 					{
-						moveDirections[i] = Orientation.None;
+						moveDirection = Orientation.None;
 					}
+					entitiesController.Move(enemies[enemyIndex], moveDirection);
 				}
-
-				entitiesController.MoveTogether(enemies.ToArray(), moveDirections);
 			}
 
+			//entitiesController.MoveTogether(enemies.ToArray(), moveDirections);
 			return UniTask.CompletedTask;
 		}
 
-			
+
 
 		private Orientation OffsetToOrientation(Vector2Int offset)
 		{
