@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Controllers.AI;
+using Controllers.CommandAnimations;
+using Controllers.Commands;
 using Controllers.Entities;
 using Controllers.Player;
 using Cysharp.Threading.Tasks;
@@ -25,7 +27,7 @@ namespace Controllers.Level
 		
 		[SerializeField] private EntitiesController entitiesController;
 		[SerializeField] private CameraController cameraController;
-		[SerializeField] private AnimationSystem animationSystem;
+		[SerializeField] private AnimationsController animationsController;
 
 		[SerializeField] private TilemapModel tilemapModel;
 
@@ -46,7 +48,7 @@ namespace Controllers.Level
 		
 			tilemapModel =	tilemapController.ProcessTileMaps();
 			
-			entitiesController.Initialize(commandsController, tilemapModel, tilemapController,animationSystem);
+			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
 		
 			sheepsController.Initialize(entitiesController);
 			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController);
@@ -55,6 +57,8 @@ namespace Controllers.Level
 				entitiesController.GetSheepViews().ToArray(),
 				entitiesController.GetEnemyViews().ToArray(),
 				entitiesController.GetDoorViews().ToArray());
+			
+			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 		}
 
 		public void Terminate()
@@ -81,7 +85,7 @@ namespace Controllers.Level
 				foreach (IPlayer player in players)
 				{
 					await player.TakeTurnAsync(token);
-					while (animationSystem.IsPlaying)
+					while (animationsController.IsPlaying)
 					{
 						//Debug.Log("Waiting for AnimationSystem");
 						await Task.Yield();

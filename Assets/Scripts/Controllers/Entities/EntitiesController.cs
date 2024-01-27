@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Controllers.Commands;
 using Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -27,19 +28,14 @@ namespace Controllers.Entities
         public IReadOnlyList<DoorEntityModel> DoorModels => doorModels;
 		[ShowInInspector,FoldoutGroup("Models")] private List<TreeEntityModel> treeModels;
         public IReadOnlyList<TreeEntityModel> TreeModels => treeModels;
+        public Dictionary<EntityModel, EntityView> ModelToView => modelToView;
 
-        [SerializeField, FoldoutGroup("Animation")] private float animMoveSpeed = 3; 
-        [SerializeField, FoldoutGroup("Animation")] private AnimationCurve animMoveCurve = AnimationCurve.EaseInOut(0,0,1,1); 
-        
-		private Dictionary<EntityModel, EntityView> modelToView = new Dictionary<EntityModel, EntityView>();
+        private Dictionary<EntityModel, EntityView> modelToView = new Dictionary<EntityModel, EntityView>();
 
 		private TilemapController tilemapController;
 
-		private AnimationSystem animationSystem;
-		
-		public void Initialize(CommandsController commands, TilemapModel model, TilemapController tilemapController, AnimationSystem animationSystem)
+		public void Initialize(CommandsController commands, TilemapModel model, TilemapController tilemapController)
 		{
-			this.animationSystem = animationSystem;
 			this.tilemapController = tilemapController;
 			commandsController = commands;
 			tilemapModel = model;
@@ -58,6 +54,8 @@ namespace Controllers.Entities
 						treeViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
 						Quaternion.identity);
+
+					view.name = $"Tree {treeModels.Count}";
 					modelToView.Add(entity, view);
 				}
 				else if (entity is EnemyEntityModel enemy)
@@ -67,6 +65,7 @@ namespace Controllers.Entities
 						enemyViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
 						Quaternion.identity);
+					view.name = $"Enemy {enemyModels.Count}";
 					modelToView.Add(entity, view);
 				}
 				else if (entity is SheepEntityModel playerModel)
@@ -81,6 +80,7 @@ namespace Controllers.Entities
 						if(x != Orientation.None)
 						{view.SetLookDirection((int)x - 1);}
 					};
+					view.name = $"Sheep {sheepModels.Count}";
 					modelToView.Add(entity, view);
 				}
 				else if (entity is DoorEntityModel door)
@@ -91,52 +91,10 @@ namespace Controllers.Entities
 						GetWorldPosition(entity.PositionIndex),
 						Quaternion.identity);
 					view.SetOpen(true);
+					view.name = $"Door {doorModels.Count}";
 					modelToView.Add(entity, view);
 				}
-
-				entity.OnPositionChange += EntityPositionChanged;
 			}
-		}
-
-		private void EntityPositionChanged(ITileEntity tileEntity, int position)
-		{
-			if (tileEntity is EntityModel model)
-			{
-				var view = modelToView[model];
-				if (position == -1)
-				{
-					Debug.Log($"{tileEntity} Removed from Tilemap");
-					view.gameObject.SetActive(false);
-				}
-				else
-				{
-					view.gameObject.SetActive(true);
-					var otherEntityModel = tilemapModel.GetEntity(position);
-					if (otherEntityModel != null)
-					{
-						animationSystem.Play(MoveAnimation(view,GetWorldPosition(position)), model, position, otherEntityModel);
-					}
-					else
-					{
-						animationSystem.Play(MoveAnimation(view,GetWorldPosition(position)), model, position);
-					}
-					//view.transform.position = GetWorldPosition(position);
-				}
-			}
-			
-		}
-
-		private IEnumerator MoveAnimation(EntityView view, Vector3 endPosition)
-		{
-			var startPosition = view.transform.position;
-			float t = 0;
-			float duration = Vector2.Distance(startPosition, endPosition) / animMoveSpeed; 
-			do
-			{
-				t += Time.deltaTime / duration;
-				view.transform.position = Vector3.LerpUnclamped(startPosition,endPosition,animMoveCurve.Evaluate(t));
-				yield return null;
-			} while (t<1);
 		}
 
 		private Vector3 GetWorldPosition(int positionIndex) => tilemapController.GetWorldPosition(positionIndex);
@@ -144,7 +102,7 @@ namespace Controllers.Entities
 		
 		public ICommand CreateCommand(EntityModel entityModel, Orientation direction)
 		{
-			Debug.Log($"MOVE:{entityModel} {direction}");
+			Debug.Log($"CreateCommand:{entityModel} {direction}");
 			var coordinate = tilemapModel.IndexToCoordinate(entityModel.PositionIndex);
 
 			if (direction == Orientation.None)
@@ -247,7 +205,7 @@ namespace Controllers.Entities
 
 		public void RemoveSheep(SheepEntityModel sheepModel) => sheepModels.Remove(sheepModel);
 		public void AddSheep(SheepEntityModel sheepModel) => sheepModels.Add(sheepModel);
-
 		
 	}
+
 }

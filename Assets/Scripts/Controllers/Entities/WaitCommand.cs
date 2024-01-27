@@ -1,8 +1,10 @@
-﻿namespace Controllers.Entities
+﻿using Controllers.Commands;
+
+namespace Controllers.Entities
 {
-	public class WaitCommand : ICommand
+	public class WaitCommand : Command<WaitCommand>
 	{
-		public void Do() { }
-		public void Undo() { }
+		protected override void DoAction() { }
+		protected override void UndoAction() { }
 	}
 }

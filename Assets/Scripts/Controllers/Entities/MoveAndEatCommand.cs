@@ -1,8 +1,9 @@
-﻿using Models;
+﻿using Controllers.Commands;
+using Models;
 
 namespace Controllers.Entities
 {
-	public class MoveAndEatCommand : ICommand
+	public class MoveAndEatCommand : Command<MoveAndEatCommand>
 	{
 		public EntitiesController EntitiesController { get; }
 		public readonly EnemyEntityModel Enemy;
@@ -18,14 +19,13 @@ namespace Controllers.Entities
 			moveCommand = new MoveCommand(enemy, tilemapModel, sheep.PositionIndex);
 		}
 
-		public void Do()
+		protected override void DoAction()
 		{
 			TilemapModel.RemoveEntity(Sheep);
 			EntitiesController.RemoveSheep(Sheep);
 			moveCommand.Do();
 		}
-
-		public void Undo()
+		protected override void UndoAction()
 		{
 			moveCommand.Undo();
 			TilemapModel.AddEntity(Sheep, moveCommand.EndPosition);

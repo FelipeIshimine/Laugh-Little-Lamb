@@ -1,6 +1,8 @@
-﻿namespace Controllers.Entities
+﻿using Controllers.Commands;
+
+namespace Controllers.Entities
 {
-	public class CompositeCommand : ICommand
+	public class CompositeCommand : Command<CompositeCommand>
 	{
 		public readonly ICommand[] Commands;
 
@@ -9,7 +11,7 @@
 			Commands = commands;
 		}
 
-		public void Do()
+		protected override void DoAction()
 		{
 			for (int i = 0; i < Commands.Length; i++)
 			{
@@ -17,7 +19,7 @@
 			}
 		}
 
-		public void Undo()
+		protected override void UndoAction()
 		{
 			for (int i = Commands.Length - 1; i >= 0; i--)
 			{

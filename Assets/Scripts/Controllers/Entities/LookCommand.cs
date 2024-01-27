@@ -1,8 +1,9 @@
-﻿using Models;
+﻿using Controllers.Commands;
+using Models;
 
 namespace Controllers.Entities
 {
-	public class LookCommand : ICommand
+	public class LookCommand : Command<LookCommand>
 	{
 		private readonly Orientation startOrientation;
 		private readonly Orientation endOrientation;
@@ -15,12 +16,12 @@ namespace Controllers.Entities
 			this.target = target;
 		}
 
-		public void Do()
+		protected override void DoAction()
 		{
 			target.LookDirection.Set(endOrientation);
 		}
 
-		public void Undo()
+		protected override void UndoAction()
 		{
 			target.LookDirection.Set(startOrientation);
 		}

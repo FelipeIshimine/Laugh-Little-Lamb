@@ -145,7 +145,7 @@ namespace Pathfinding
 				if (index == destination)
 				{
 					closestIndex = index;
-					Debug.Log("FOUND");
+					//Debug.Log("FOUND");
 					break;
 				}
 				
@@ -172,9 +172,6 @@ namespace Pathfinding
 					}
 				}
 			}
-			Debug.Log($"Queue is empty:{next.Count == 0}");
-
-
 			path = new List<int>();
 			bool success = closestIndex == destination;
 

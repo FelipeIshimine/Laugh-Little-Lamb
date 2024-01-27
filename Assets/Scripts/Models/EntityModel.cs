@@ -24,6 +24,8 @@ namespace Models
 		{
 			positionIndex = index;
 		}
+
+		public override string ToString() => $"{GetType().Name} {Index}";
 	}
 
 	public interface IMove { }

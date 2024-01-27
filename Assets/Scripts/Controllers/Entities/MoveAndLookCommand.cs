@@ -1,41 +1,31 @@
-﻿using Models;
+﻿using Controllers.Commands;
+using Models;
 
 namespace Controllers.Entities
 {
-	public class MoveAndLookCommand : ICommand
+	public class MoveAndLookCommand : Command<MoveAndLookCommand>
 	{
-		public readonly Orientation StartOrientation;
-		public readonly int StartPosition;
-		public readonly Orientation EndOrientation;
-		public readonly int EndPosition;
+		public readonly MoveCommand MoveCommand;
+		public readonly LookCommand LookCommand;
 
-		private SheepEntityModel target;
-		private TilemapModel model;
-		
 		public MoveAndLookCommand(
 			SheepEntityModel target,
 			TilemapModel model,
 			Orientation endOrientation,
 			int endPosition)
 		{
-			this.model = model;
-			EndOrientation = endOrientation;
-			EndPosition = endPosition;
-			this.target = target;
-			StartOrientation = target.LookDirection;
-			StartPosition = target.PositionIndex;
+			LookCommand = new LookCommand(target, endOrientation);
+			MoveCommand = new MoveCommand(target, model, endPosition);
 		}
-
-		public void Do()
+		protected override void DoAction()
 		{
-			target.LookDirection.Set(EndOrientation);
-			model.SwapEntities(StartPosition,EndPosition);
+			LookCommand.Do();
+			MoveCommand.Do();
 		}
-
-		public void Undo()
+		protected override void UndoAction()
 		{
-			target.LookDirection.Set(StartOrientation);
-			model.SwapEntities(StartPosition,EndPosition);
+			MoveCommand.Undo();
+			LookCommand.Undo();
 		}
 	}
 }

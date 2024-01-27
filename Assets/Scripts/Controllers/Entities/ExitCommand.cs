@@ -1,8 +1,9 @@
-﻿using Models;
+﻿using Controllers.Commands;
+using Models;
 
 namespace Controllers.Entities
 {
-	public class ExitCommand : ICommand
+	public class ExitCommand : Command<ExitCommand>
 	{
 		public readonly int StartPosition;
 		public readonly SheepEntityModel SheepModel;
@@ -18,13 +19,13 @@ namespace Controllers.Entities
 			SheepModel = sheep;
 		}
 
-		public void Do()
+		protected override void DoAction()
 		{
 			Model.RemoveEntity(SheepModel);
 			EntitiesController.RemoveSheep(SheepModel);
 		}
 
-		public void Undo()
+		protected override void UndoAction()
 		{
 			EntitiesController.AddSheep(SheepModel);
 			Model.AddEntity(SheepModel, StartPosition);

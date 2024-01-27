@@ -1,32 +1,31 @@
-﻿using Models;
+﻿using Controllers.Commands;
+using Models;
 
 namespace Controllers.Entities
 {
-	public class MoveCommand : ICommand
+	public class MoveCommand : Command<MoveCommand>
 	{
 		public readonly int StartPosition;
 		public readonly int EndPosition;
-		public readonly EntityModel Target;
-		public readonly TilemapModel Model;
+		public readonly EntityModel EntityModel;
+		public readonly TilemapModel TilemapModel;
 		
-		public MoveCommand(EntityModel target, TilemapModel model, int endPosition)
+		public MoveCommand(EntityModel entityModel, TilemapModel tilemapModel, int endPosition)
 		{
-			this.Model = model;
+			this.TilemapModel = tilemapModel;
 			this.EndPosition = endPosition;
-			this.Target = target;
-			StartPosition = target.PositionIndex;
+			this.EntityModel = entityModel;
+			StartPosition = entityModel.PositionIndex;
 		}
-
-		public void Do()
+		protected override void DoAction()
 		{
-			Model.SwapEntities(StartPosition,EndPosition);
+			TilemapModel.SwapEntities(StartPosition,EndPosition);
 		}
-
-		public void Undo()
+		protected override void UndoAction()
 		{
-			Model.SwapEntities(StartPosition,EndPosition);
+			TilemapModel.SwapEntities(StartPosition,EndPosition);
 		}
 
-		public override string ToString() => $"{Target.GetType().Name} {StartPosition}=>{EndPosition}";
+		public override string ToString() => $"{EntityModel.GetType().Name} {StartPosition}=>{EndPosition}";
 	}
 }
