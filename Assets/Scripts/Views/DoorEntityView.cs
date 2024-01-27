@@ -4,7 +4,6 @@ namespace Views
 {
 	public class DoorEntityView : EntityView
 	{
-		[SerializeField] private SpriteRenderer spriteRenderer;
 		[SerializeField] private Sprite openSprite;
 		[SerializeField] private Sprite closeSprite;
 

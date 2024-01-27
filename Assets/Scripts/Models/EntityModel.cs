@@ -4,9 +4,9 @@ using UnityEngine;
 namespace Models
 {
 	[System.Serializable]
-	public abstract class EntityModel : DataModel<EntityModel>
+	public abstract class EntityModel<T> : DataModel<T>, ICoordinate where T : EntityModel<T>
 	{
-		public event Action<EntityModel,int> OnPositionChange;
+		public event Action<ICoordinate,int> OnPositionChange;
 		private int positionIndex;
 		public int PositionIndex
 		{
@@ -16,7 +16,7 @@ namespace Models
 				if (positionIndex != value)
 				{
 					positionIndex = value;
-					OnPositionChange?.Invoke(this, value);
+					OnPositionChange?.Invoke((T)this, value);
 				}
 			}
 		}
@@ -24,6 +24,14 @@ namespace Models
 		{
 			positionIndex = index;
 		}
+	}
+
+	public interface IMove { }
+
+	public interface ICoordinate
+	{
+		public event Action<ICoordinate,int> OnPositionChange;
+		public int PositionIndex { get; }
 	}
 }
 
