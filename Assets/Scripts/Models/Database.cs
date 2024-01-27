@@ -71,5 +71,6 @@ namespace Model
 	        Debug.Log("Database Loaded");
 	        instance = this;
         }
+  
 	}
 }
