@@ -159,18 +159,22 @@ namespace Controllers.Entities
 			{
 				var targetEntity = tilemapModel.GetEntity(targetPosition);
 				
-				if (entityModel is SheepEntityModel playerEntityModel)
+				if (entityModel is SheepEntityModel sheepEntityModel)
 				{
 					if (targetEntity is DoorEntityModel door)
 					{
-						return new ExitCommand(playerEntityModel, door, tilemapModel, this);
+						return new ExitCommand(sheepEntityModel, door, tilemapModel, this);
 					}
 
 					return new MoveAndLookCommand(
-						playerEntityModel,
+						sheepEntityModel,
 						tilemapModel,
 						direction,
 						targetPosition);
+				}
+				if (entityModel is EnemyEntityModel enemyEntityModel && targetEntity is SheepEntityModel sheep)
+				{
+					return new MoveAndEatCommand(enemyEntityModel, sheep, tilemapModel,this);
 				}
 				return new MoveCommand(
 					entityModel,
@@ -192,7 +196,11 @@ namespace Controllers.Entities
 		private bool CanWalk(EntityModel entityModel, int targetPosition)
 		{
 			var targetEntity = tilemapModel.GetEntity(targetPosition);
-			if (entityModel is SheepEntityModel sheep && targetEntity is DoorEntityModel doorEntityModel)
+			if (entityModel is SheepEntityModel sheep && targetEntity is DoorEntityModel)
+			{
+				return true;
+			}
+			if (entityModel is EnemyEntityModel enemy && targetEntity is SheepEntityModel)
 			{
 				return true;
 			}

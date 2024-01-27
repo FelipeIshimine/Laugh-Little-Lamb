@@ -4,30 +4,29 @@ namespace Controllers.Entities
 {
 	public class MoveCommand : ICommand
 	{
-		private int startPosition;
-		private int endPosition;
-
-		private EntityModel target;
-		private TilemapModel model;
+		public readonly int StartPosition;
+		public readonly int EndPosition;
+		public readonly EntityModel Target;
+		public readonly TilemapModel Model;
 		
 		public MoveCommand(EntityModel target, TilemapModel model, int endPosition)
 		{
-			this.model = model;
-			this.endPosition = endPosition;
-			this.target = target;
-			startPosition = target.PositionIndex;
+			this.Model = model;
+			this.EndPosition = endPosition;
+			this.Target = target;
+			StartPosition = target.PositionIndex;
 		}
 
 		public void Do()
 		{
-			model.SwapEntities(startPosition,endPosition);
+			Model.SwapEntities(StartPosition,EndPosition);
 		}
 
 		public void Undo()
 		{
-			model.SwapEntities(startPosition,endPosition);
+			Model.SwapEntities(StartPosition,EndPosition);
 		}
 
-		public override string ToString() => $"{target.GetType().Name} {startPosition}=>{endPosition}";
+		public override string ToString() => $"{Target.GetType().Name} {StartPosition}=>{EndPosition}";
 	}
 }

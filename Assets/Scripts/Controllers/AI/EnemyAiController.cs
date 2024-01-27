@@ -62,12 +62,6 @@ namespace Controllers.AI
 
 		public UniTask TakeTurnAsync(CancellationToken token)
 		{
-			int[] targetPositions = new int[sheeps.Count];
-			for (var index = 0; index < sheeps.Count; index++)
-			{
-				targetPositions[index] = sheeps[index].PositionIndex;
-			}
-
 			//Orientation[] moveDirections = new Orientation[enemies.Count];
 			for (var i = 0; i < enemies.Count; i++)
 			{
@@ -84,6 +78,12 @@ namespace Controllers.AI
 						return entity == null || entity is SheepEntityModel || entity == enemies[enemyIndex];
 					}
 
+					int[] targetPositions = new int[sheeps.Count];
+					for (var index = 0; index < sheeps.Count; index++)
+					{
+						targetPositions[index] = sheeps[index].PositionIndex;
+					}
+					
 					var enemyEntityModel = enemies[i];
 					Pathfinding.AStar.TryFindMultiPath(
 						enemyEntityModel.PositionIndex,
