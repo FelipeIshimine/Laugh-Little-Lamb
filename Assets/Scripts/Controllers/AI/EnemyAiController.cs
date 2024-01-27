@@ -8,10 +8,12 @@ using Models;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Controllers
+namespace Controllers.AI
 {
 	public class EnemyAiController : MonoBehaviour, IPlayer
 	{
+		[SerializeField] private int moveSpeed = 2;
+		
 		private IReadOnlyList<EnemyEntityModel> enemies;
 		private IReadOnlyList<SheepEntityModel> sheeps;
 		
@@ -60,61 +62,64 @@ namespace Controllers
 
 		public UniTask TakeTurnAsync(CancellationToken token)
 		{
-			int[] targetPositions = new int[sheeps.Count];
-			for (var index = 0; index < sheeps.Count; index++)
+			for (int move = 0; move < moveSpeed; move++)
 			{
-				targetPositions[index]= sheeps[index].PositionIndex;
-			}
-
-			Orientation[] moveDirections = new Orientation[enemies.Count];
-			for (var i = 0; i < enemies.Count; i++)
-			{
-				normalPathfinder.CalculateAdjacencies();
-				normalPathfinder.CalculateCosts();
-
-				bool IsWalkable(int index)
+				int[] targetPositions = new int[sheeps.Count];
+				for (var index = 0; index < sheeps.Count; index++)
 				{
-					var entity = tilemapModel.GetEntity(index);
-					return entity == null || entity is SheepEntityModel || entity == enemies[i];
+					targetPositions[index] = sheeps[index].PositionIndex;
 				}
-				
-				var enemyEntityModel = enemies[i];
-				Pathfinding.AStar.TryFindMultiPath(
-					enemyEntityModel.PositionIndex,
-					targetPositions,
-					IsWalkable,
-					index => normalPathfinder.GetNeighbours(index),
-					index => normalPathfinder.GetDistance(enemyEntityModel.PositionIndex, index),
-					normalPathfinder.GetCost,
-					normalPathfinder.Length,
-					ref path,
-					out var pathCost);
 
-				if (path.Count > 1)
+				Orientation[] moveDirections = new Orientation[enemies.Count];
+				for (var i = 0; i < enemies.Count; i++)
 				{
-					var startColor = Color.blue;
-					var endColor = Color.red;
+					normalPathfinder.CalculateAdjacencies();
+					normalPathfinder.CalculateCosts();
 
-					for (int j = 0; j < path.Count-1; j++)
+					bool IsWalkable(int index)
 					{
-						Debug.DrawLine(
-							tilemapController.GetWorldPosition(path[j]),
-							tilemapController.GetWorldPosition(path[j+1]),
-							Color.Lerp(startColor,endColor, (float)j / (path.Count-1)));
+						var entity = tilemapModel.GetEntity(index);
+						return entity == null || entity is SheepEntityModel || entity == enemies[i];
 					}
-					
-					Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
-					var offset = tilemapModel.IndexToCoordinate(path[1])- tilemapModel.IndexToCoordinate(path[0]);
-					moveDirections[i] = OffsetToOrientation(offset);
+
+					var enemyEntityModel = enemies[i];
+					Pathfinding.AStar.TryFindMultiPath(
+						enemyEntityModel.PositionIndex,
+						targetPositions,
+						IsWalkable,
+						index => normalPathfinder.GetNeighbours(index),
+						index => normalPathfinder.GetDistance(enemyEntityModel.PositionIndex, index),
+						normalPathfinder.GetCost,
+						normalPathfinder.Length,
+						ref path,
+						out var pathCost);
+
+					if (path.Count > 1)
+					{
+						var startColor = Color.blue;
+						var endColor = Color.red;
+
+						for (int j = 0; j < path.Count - 1; j++)
+						{
+							Debug.DrawLine(
+								tilemapController.GetWorldPosition(path[j]),
+								tilemapController.GetWorldPosition(path[j + 1]),
+								Color.Lerp(startColor, endColor, (float)j / (path.Count - 1)));
+						}
+
+						Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
+						var offset = tilemapModel.IndexToCoordinate(path[1]) - tilemapModel.IndexToCoordinate(path[0]);
+						moveDirections[i] = OffsetToOrientation(offset);
+					}
+					else
+					{
+						moveDirections[i] = Orientation.None;
+					}
 				}
-				else
-				{
-					moveDirections[i] = Orientation.None;
-				}
+
+				entitiesController.MoveTogether(enemies.ToArray(), moveDirections);
 			}
-			
-			entitiesController.MoveTogether(enemies.ToArray(), moveDirections);
-			
+
 			return UniTask.CompletedTask;
 		}
 
