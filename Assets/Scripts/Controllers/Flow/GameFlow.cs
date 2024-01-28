@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Controllers.Level;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -15,10 +17,18 @@ namespace Controllers
 
 		private void Start()
 		{
-			GoToLevel();
+			GoToMenu();
 		}
 
-		private async void GoToLevel()
+		private async UniTask GoToMenu()
+		{
+			await Addressables.LoadSceneAsync(mainMenu).Task;
+
+			//MainMenuController mainMenuController = FindFirstObjectByType<MainMenuController>();
+
+		}
+
+		private async UniTask GoToLevel()
 		{
 			await Addressables.LoadSceneAsync(levelScene).Task;
 		

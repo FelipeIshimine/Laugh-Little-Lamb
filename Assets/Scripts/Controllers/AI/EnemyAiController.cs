@@ -136,18 +136,18 @@ namespace Controllers.AI
 			Orientation moveDirection;
 					
 			var enemyEntityModel = enemies[i];
-			Pathfinding.AStar.TryFindMultiPath(
+			bool success = Pathfinding.AStar.TryFindMultiPath(
 				enemyEntityModel.PositionIndex,
 				targetPositions,
 				isWalkable,
-				index => pathFinderModel.GetNeighbours(index),
+				pathFinderModel.GetNeighbours,
 				index => pathFinderModel.GetDistance(enemyEntityModel.PositionIndex, index),
 				pathFinderModel.GetCost,
 				pathFinderModel.Length,
 				ref path,
 				out var pathCost);
 
-			if (path.Count > 1)
+			if (success && path.Count > 1)
 			{
 				var startColor = Color.blue;
 				var endColor = Color.red;
@@ -180,17 +180,17 @@ namespace Controllers.AI
 				var entity = tilemapModel.GetEntity(index);
 				return entity == null || entity == enemies[enemyIndex];
 			}
-			
-			List<int> targetPositions = new List<int>(tilemapModel.FloorTiles);
 
-			foreach (var lightBeamModel in tilemapModel.LightBeamModels)
+			var currentEnemy = enemies[enemyIndex];
+			List<int> targetPositions = new List<int>(tilemapModel.FloorTiles.Count);
+			foreach (int tileIndex in tilemapModel.FloorTiles)
 			{
-				foreach (var position in lightBeamModel.Positions)
+				var otherEntity = tilemapModel.GetEntity(tileIndex);
+				if (!tilemapModel.IsIlluminated(tileIndex) && (otherEntity == null ||  otherEntity != currentEnemy))
 				{
-					targetPositions.Remove(position);
+					targetPositions.Add(tileIndex);
 				}
 			}
-			
 			ProcessEnemy(i, scaredPathfinder, IsWalkable, targetPositions.ToArray());
 		}
 

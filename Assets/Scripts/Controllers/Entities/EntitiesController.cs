@@ -70,19 +70,21 @@ namespace Controllers.Entities
 					view.name = $"Enemy {enemyModels.Count}";
 					modelToView.Add(entity, view);
 				}
-				else if (entity is SheepEntityModel playerModel)
+				else if (entity is SheepEntityModel sheepModel)
 				{
-					sheepModels.Add(playerModel);
+					sheepModels.Add(sheepModel);
 					var view = Instantiate(
 						sheepViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
 						Quaternion.identity);
-					playerModel.LookDirection.OnUpdate += x =>
+					
+					sheepModel.LookDirection.OnUpdate += x =>
 					{
 						if(x != Orientation.None)
 						{view.SetLookDirection((int)x - 1);}
 					};
 					view.name = $"Sheep {sheepModels.Count}";
+					view.SetLookDirection((int)sheepModel.LookDirection.Value-1);
 					modelToView.Add(entity, view);
 				}
 				else if (entity is DoorEntityModel door)
