@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Controllers.Commands;
 using Controllers.Entities;
 using Cysharp.Threading.Tasks;
 using Models;
@@ -26,8 +27,11 @@ namespace Controllers.AI
 		private EntitiesController entitiesController;
 		private TilemapController tilemapController;
 
-		public void Initialize(EntitiesController entities,TilemapModel tilemapModel, IReadOnlyList<EnemyEntityModel> enemies, IReadOnlyList<SheepEntityModel> sheepEntityModels, TilemapController tilemapController)
+		private CommandsController commandsController;
+	
+		public void Initialize(EntitiesController entities,TilemapModel tilemapModel, IReadOnlyList<EnemyEntityModel> enemies, IReadOnlyList<SheepEntityModel> sheepEntityModels, TilemapController tilemapController, CommandsController commandsController)
 		{
+			this.commandsController = commandsController;
 			this.tilemapController = tilemapController;
 			this.entitiesController = entities;
 			this.tilemapModel = tilemapModel;
@@ -63,6 +67,9 @@ namespace Controllers.AI
 		public UniTask TakeTurnAsync(CancellationToken token)
 		{
 			//Orientation[] moveDirections = new Orientation[enemies.Count];
+			
+			commandsController.Do(new EnemyTurnStart());
+			
 			for (var i = 0; i < enemies.Count; i++)
 			{
 				for (int move = 0; move < moveSpeed; move++)
@@ -123,6 +130,7 @@ namespace Controllers.AI
 			}
 
 			//entitiesController.MoveTogether(enemies.ToArray(), moveDirections);
+			commandsController.Do(new EnemyTurnEnd());
 			return UniTask.CompletedTask;
 		}
 

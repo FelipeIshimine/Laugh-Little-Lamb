@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Controllers.Commands;
+using UnityEngine;
 
 namespace Controllers.Commands
 {
@@ -11,12 +12,14 @@ namespace Controllers.Commands
 
 		public void Do()
 		{
+			Debug.Log($">>> {GetType().Name}.Do()");
 			DoAction();
 			OnDo.Raise((T)this);
 		}
 
 		public void Undo()
 		{
+			Debug.Log($"<<< {GetType().Name}.Undo()");
 			UndoAction();
 			OnUndo.Raise((T)this);
 		}

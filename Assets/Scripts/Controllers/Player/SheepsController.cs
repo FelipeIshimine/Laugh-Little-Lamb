@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Controllers.Commands;
 using Controllers.Entities;
 using Cysharp.Threading.Tasks;
 using Models;
@@ -17,9 +18,10 @@ namespace Controllers.Player
 		private EntitiesController entitiesController;
 
 		private TaskCompletionSource<Orientation> orientationTcs;
-
-		public void Initialize(EntitiesController entitiesController)
+		private CommandsController commandsController;
+		public void Initialize(EntitiesController entitiesController, CommandsController commandsController)
 		{
+			this.commandsController = commandsController;
 			this.entitiesController = entitiesController;
 		}
 
@@ -86,6 +88,8 @@ namespace Controllers.Player
 
 		public async UniTask TakeTurnAsync(CancellationToken token)
 		{
+			commandsController.Do(new SheepTurnStart());
+			
             gameObject.SetActive(true);
 			Debug.Log("Player Turn Start");
 			orientationTcs = new TaskCompletionSource<Orientation>();
@@ -93,6 +97,8 @@ namespace Controllers.Player
 			entitiesController.MoveTogether(entitiesController.SheepEntityModels,result);
 			Debug.Log("Player Turn End");
             gameObject.SetActive(false);
+            
+            commandsController.Do(new SheepTurnEnd());
 		}
 
 	}

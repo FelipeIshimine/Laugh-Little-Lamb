@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -8,9 +9,9 @@ namespace Models
 	[System.Serializable]
 	public class TilemapModel
 	{
-		public const int LIGHT_LENGTH = 3;
+		public event Action OnLightCalculation;
 		[SerializeField] private List<int> floorTiles;
-		[SerializeField] private List<int> illuminatedTiles;
+		[SerializeField] private List<LightBeamModel> lightBeamModels;
 		[SerializeField] private EntityModel[] entities;
 		[SerializeField] private BoundsInt bounds;
 		
@@ -25,7 +26,7 @@ namespace Models
 			this.bounds = bounds;
 			this.floorTiles = floorTiles;
 			this.entities = entities;
-			illuminatedTiles = new List<int>();
+			lightBeamModels = new List<LightBeamModel>();
 
 			foreach (EntityModel entityModel in this.entities)
 			{
@@ -34,13 +35,13 @@ namespace Models
 					ActiveSheeps.Add(sheepEntityModel);
 				}
 			}
-			CalculateLights();
+			//CalculateLights();
 		}
 
 		public bool IsFloor(int index) => floorTiles.Contains(index);
 
 		public int Count => bounds.size.x * bounds.size.y;
-		public IEnumerable<int> IlluminatedTiles => illuminatedTiles;
+		public IEnumerable<LightBeamModel> LightBeamModels => lightBeamModels;
 
 		public int CoordinateToIndex(Vector2Int coordinate) => coordinate.x - bounds.x + (coordinate.y - bounds.y) * bounds.size.x;
 		public Vector2Int IndexToCoordinate(int index) => new Vector2Int(index % bounds.size.x, index / bounds.size.x) + new Vector2Int(bounds.min.x,bounds.min.y);
@@ -143,20 +144,48 @@ namespace Models
 		public bool IsEmpty(Vector2Int targetCoordinate) => IsEmpty(CoordinateToIndex(targetCoordinate));
 
 
-		public void Illuminate(params int[] indexes)
+		public LightBeamModel CreateLightBeam(EntityModel entity, Orientation direction, int distance)
 		{
-			illuminatedTiles.AddRange(indexes);
-		}
-
-		public void Obscure(params int[] indexes)
-		{
-			foreach (int index in indexes)
+			List<int> positions = new List<int>();
+			var coordinate = IndexToCoordinate(entity.PositionIndex);
+			var offset = direction.ToVector2Int();
+			for (int i = 0; i < distance; i++)
 			{
-				illuminatedTiles.Remove(index);
+				coordinate += offset;
+				int index = CoordinateToIndex(coordinate);
+				if (bounds.Contains((Vector3Int)coordinate) && IsEmpty(index))
+				{
+					positions.Add(index);
+				}
+				else
+				{
+					break;
+				}
 			}
+			
+			var lightBeam = new LightBeamModel(entity,positions.ToArray());
+			AddLightBeam(lightBeam);
+			return lightBeam;
 		}
 
-		public bool IsIlluminated(int index) => illuminatedTiles.Contains(index);
+		public void AddLightBeam(LightBeamModel lightBeam)
+		{
+			lightBeamModels.Add(lightBeam);
+		}
+
+		public void RemoveLightBeam(LightBeamModel beamModel) => lightBeamModels.Remove(beamModel);
+
+		public bool IsIlluminated(int index)
+		{
+			foreach (LightBeamModel lightBeamModel in lightBeamModels)
+			{
+				if (lightBeamModel.Contains(index))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 
 		public bool Contains(int targetPosition) => bounds.Contains((Vector3Int)IndexToCoordinate(targetPosition));
 
@@ -176,6 +205,7 @@ namespace Models
 			AddEntity(sheep, sheepPosition);
 		}
 
+		/*
 		[Button]
 		public void CalculateLights()
 		{
@@ -184,24 +214,25 @@ namespace Models
 			foreach (SheepEntityModel sheepEntityModel in ActiveSheeps)
 			{
 				var coordinate = IndexToCoordinate(sheepEntityModel.PositionIndex);
+				List<int> positions = new List<int>();
 				for (int i = 0; i < LIGHT_LENGTH; i++)
 				{
 					coordinate += sheepEntityModel.LookDirection.Value.ToVector2Int();
 					int index = CoordinateToIndex(coordinate);
 					if (bounds.Contains((Vector3Int)coordinate) && IsEmpty(index))
 					{
-						if (!illuminatedTiles.Contains(index))
-						{
-							illuminatedTiles.Add(index);
-						}
+						positions.Add(index);
 					}
 					else
 					{
 						break;
 					}
 				}
+				illuminatedTiles.Add(new LightBeamModel(positions.ToArray()));
 			}
-			
-		}
+			OnLightCalculation?.Invoke();
+		}*/
+		public LightBeamModel GetLightBeam(EntityModel sourceEntity) =>
+			lightBeamModels.Find(x => x.SourceEntity == sourceEntity);
 	}
 }

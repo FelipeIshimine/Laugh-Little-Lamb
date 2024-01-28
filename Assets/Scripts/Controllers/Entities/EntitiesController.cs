@@ -30,7 +30,7 @@ namespace Controllers.Entities
         public IReadOnlyList<TreeEntityModel> TreeModels => treeModels;
         public Dictionary<EntityModel, EntityView> ModelToView => modelToView;
 
-        private Dictionary<EntityModel, EntityView> modelToView = new Dictionary<EntityModel, EntityView>();
+        private readonly Dictionary<EntityModel, EntityView> modelToView = new Dictionary<EntityModel, EntityView>();
 
 		private TilemapController tilemapController;
 
@@ -95,6 +95,13 @@ namespace Controllers.Entities
 					modelToView.Add(entity, view);
 				}
 			}
+
+			List<TurnLightOnCommand> turnOnLightsCommands = new List<TurnLightOnCommand>();
+			foreach (SheepEntityModel sheepEntityModel in sheepModels)
+			{
+				turnOnLightsCommands.Add(new TurnLightOnCommand(sheepEntityModel, tilemapModel));
+			}
+			commandsController.Do(new CompositeCommand(turnOnLightsCommands));
 		}
 
 		private Vector3 GetWorldPosition(int positionIndex) => tilemapController.GetWorldPosition(positionIndex);
@@ -122,15 +129,17 @@ namespace Controllers.Entities
 					if (targetEntity is DoorEntityModel door)
 					{
 						return new LookMoveAndExitCommand(sheepEntityModel, door,tilemapModel,direction, this);
-						
-						//return new ExitCommand(sheepEntityModel, door, tilemapModel, this);
 					}
-
-					return new MoveAndLookCommand(
+					
+					return new CompositeCommand(
+						new TurnLightOffCommand(sheepEntityModel, tilemapModel),
+						new MoveAndLookCommand(
 						sheepEntityModel,
 						tilemapModel,
 						direction,
-						targetPosition);
+						targetPosition),
+						new TurnLightOnCommand(sheepEntityModel, tilemapModel)
+						);
 				}
 				if (entityModel is EnemyEntityModel enemyEntityModel && targetEntity is SheepEntityModel sheep)
 				{

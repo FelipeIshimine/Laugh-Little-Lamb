@@ -11,7 +11,7 @@ using Cysharp.Threading.Tasks;
 using Models;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Views;
+using UnityEngine.InputSystem;
 
 namespace Controllers.Level
 {
@@ -31,6 +31,10 @@ namespace Controllers.Level
 
 		[SerializeField] private TilemapModel tilemapModel;
 
+		[SerializeField] private InputAction inputUndo;
+		[SerializeField] private InputAction inputRedo;
+		
+
 		public IPlayer[] players;
 		private async UniTaskVoid Awake()
 		{
@@ -46,27 +50,74 @@ namespace Controllers.Level
 			
 			commandsController.Initialize();
 		
-			tilemapController.Initialize();
 			tilemapModel =	tilemapController.ProcessTileMaps();
 			
+			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
 		
-			sheepsController.Initialize(entitiesController);
-			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController);
+			sheepsController.Initialize(entitiesController, commandsController);
+			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController, commandsController);
 			
 			cameraController.Initialize(
 				entitiesController.GetSheepViews().ToArray(),
 				entitiesController.GetEnemyViews().ToArray(),
 				entitiesController.GetDoorViews().ToArray());
-			
-			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
+
+			inputUndo.performed += UndoTurn;
+			inputRedo.performed += RedoTurn;
+			inputUndo.Enable();
+			inputRedo.Enable();
 		}
 
 		public void Terminate()
 		{
-			tilemapController.Terminate();
+			inputUndo.Disable();
+			inputRedo.Disable();
+			inputUndo.performed -= UndoTurn;
+			inputRedo.performed -= RedoTurn;
+
 			commandsController.Terminate();
 			cameraController.Terminate();
+		}
+
+		private async void UndoTurn(InputAction.CallbackContext obj)
+		{
+			if (animationsController.IsPlaying)
+			{
+				return;
+			}
+			if (commandsController.HistoryStack.TryPeek(out var result) && result is SheepTurnStart)
+			{
+				commandsController.Undo();
+			}
+			commandsController.Undo<SheepTurnStart>();
+
+			Time.timeScale = 3;
+			while (animationsController.IsPlaying)
+			{
+				await UniTask.NextFrame();
+			}
+			Time.timeScale = 1;
+		}
+
+		private async void RedoTurn(InputAction.CallbackContext obj)
+		{
+			if (animationsController.IsPlaying)
+			{
+				return;
+			}
+			if (commandsController.RedoStack.TryPeek(out var result) && result is SheepTurnStart)
+			{
+				commandsController.Redo();
+			}
+			commandsController.Redo<SheepTurnStart>();
+			
+			Time.timeScale = 3;
+			while (animationsController.IsPlaying)
+			{
+				await UniTask.NextFrame();
+			}
+			Time.timeScale = 1;
 		}
 
 		public async UniTask GameLoop(CancellationToken token)

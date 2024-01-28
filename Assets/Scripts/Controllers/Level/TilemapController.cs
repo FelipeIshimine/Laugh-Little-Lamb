@@ -35,22 +35,7 @@ namespace Controllers
 		[SerializeField, FoldoutGroup("Debug")] private DebugModes debugModes;
 		private CommandListener<MoveCommand> doListener;
 		private CommandListener<MoveCommand> undoListener;
-		public void Initialize()
-		{
-			doListener = MoveCommand.OnDo.AddListener(MoveCmdDo);
-			undoListener = MoveCommand.OnUndo.AddListener(MoveCmdDo);
-		}
-
-		public void Terminate()
-		{
-				MoveCommand.OnDo.RemoveListener(doListener);
-				MoveCommand.OnUndo.RemoveListener(undoListener);
-		}
-		
-		private void MoveCmdDo(MoveCommand obj)
-		{
-			tilemapModel.CalculateLights();
-		}
+		public TilemapModel Model => tilemapModel;
 
 		[Button]
 		public TilemapModel ProcessTileMaps()
@@ -225,12 +210,15 @@ namespace Controllers
 				{
 					var color = new Color(1,1,0,.65f);
 					Gizmos.color = color;
-					foreach (int index in tilemapModel.IlluminatedTiles)
+					foreach (var index in tilemapModel.LightBeamModels)
 					{
-						var coordinate = tilemapModel.IndexToCoordinate(index);
-						terrainTilemap.GetCellCenterWorld(coordinate);
-						var center = terrainTilemap.GetCellCenterWorld(coordinate);
-						Gizmos.DrawCube(center, Vector3.one);
+						foreach (int indexPosition in index.Positions)
+						{
+							var coordinate = tilemapModel.IndexToCoordinate(indexPosition);
+							terrainTilemap.GetCellCenterWorld(coordinate);
+							var center = terrainTilemap.GetCellCenterWorld(coordinate);
+							Gizmos.DrawCube(center, Vector3.one);
+						}
 					}
 				}
 
