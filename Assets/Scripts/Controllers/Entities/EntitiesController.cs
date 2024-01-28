@@ -109,6 +109,7 @@ namespace Controllers.Entities
 				turnOnLightsCommands.Add(new TurnLightOnCommand(sheepEntityModel, tilemapModel, lightLength));
 			}
 			commandsController.Do(new CompositeCommand(turnOnLightsCommands));
+			commandsController.ClearAll();
 		}
 
 		private Vector3 GetWorldPosition(int positionIndex) => tilemapController.GetWorldPosition(positionIndex);

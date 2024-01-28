@@ -36,12 +36,12 @@ namespace Controllers.CommandAnimations
 			var otherEntityModel = command.TilemapModel.GetEntity(position);
 			if (otherEntityModel != null)
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position)), command.EntityModel, position,
+				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),false), command.EntityModel, position,
 					otherEntityModel);
 			}
 			else
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position)), command.EntityModel, position);
+				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),false), command.EntityModel, position);
 			}
 		}
 
@@ -53,28 +53,31 @@ namespace Controllers.CommandAnimations
 			var otherEntityModel = command.TilemapModel.GetEntity(position);
 			if (otherEntityModel != null)
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position)), command.EntityModel, position,
+				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),true), command.EntityModel, position,
 					otherEntityModel);
 			}
 			else
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position)), command.EntityModel, position);
+				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),true), command.EntityModel, position);
 			}
 		}
 
-		private IEnumerator MoveAnimation(EntityView view, Vector3 endPosition)
+		private IEnumerator MoveAnimation(EntityView view, Vector3 endPosition, bool playSound)
 		{
 			//Debug.Log($"MoveAnimation:{view.name} {endPosition}");
 			view.gameObject.SetActive(true);
 			var startPosition = view.transform.position;
 
-			if (view is EnemyEntityView)
+			if(playSound)
 			{
-				AudioSource.PlayClipAtPoint(enemyStepClip, Vector3.zero);
-			}
-			else if (view is SheepEntityView)
-			{
-				AudioSource.PlayClipAtPoint(lambStepClip, Vector3.zero);
+				if (view is EnemyEntityView)
+				{
+					AudioSource.PlayClipAtPoint(enemyStepClip, Vector3.zero, .05f);
+				}
+				else if (view is SheepEntityView)
+				{
+					AudioSource.PlayClipAtPoint(lambStepClip, Vector3.zero, 1.5f);
+				}
 			}
 			float t = 0;
 			float duration = Vector2.Distance(startPosition, endPosition) / animMoveSpeed; 

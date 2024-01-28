@@ -99,3 +99,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 2737693388169308687}
+  sprites:
+  - {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}
+  - {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}
+  - {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}
+  - {fileID: 21300000, guid: 2f2d81326a8219e4fa4de5334b007bcc, type: 3}
+  - {fileID: 21300000, guid: cae34342f9623e3409783af08fcb1a23, type: 3}
+  - {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}
+  - {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}
+  - {fileID: 21300000, guid: b56af6e6bfc0dc740b0dee1668608f83, type: 3}

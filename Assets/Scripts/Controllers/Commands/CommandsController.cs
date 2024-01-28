@@ -87,7 +87,12 @@ namespace Controllers.Commands
 				Redo();
 			} 
 		}
-		
+
+		public void ClearAll()
+		{
+			historyStack.Clear();
+			redoStack.Clear();			
+		}
 	}
 
 	public abstract class CommandListener : IComparable<CommandListener> 

@@ -27,7 +27,7 @@ namespace Controllers
 
 		private void Play()
 		{
-			AudioSource.PlayClipAtPoint(playSfx, Vector3.zero, .2f);
+			AudioSource.PlayClipAtPoint(playSfx, Vector3.zero, .01f);
 			resultCompletionSource?.TrySetResult(new PlayResult());
 		}
 

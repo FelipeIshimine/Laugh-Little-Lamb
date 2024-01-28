@@ -66,7 +66,6 @@ namespace Controllers
 
 				if (levelResult is LevelController.RestartResult)
 				{
-					levelIndex = 0;
 					goto Level;
 				}
 			}
