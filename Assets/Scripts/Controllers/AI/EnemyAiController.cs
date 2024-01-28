@@ -52,9 +52,10 @@ namespace Controllers.AI
 				this.tilemapModel.Count, 
 				x=>this.tilemapModel.GetNeighbours(x).ToArray(),
 				this.tilemapModel.IsFloor,
-				CalculateNormalTileCost,
+				CalculateScaredTileCost,
 				CalculateNormalDistanceBetween);
 		}
+
 
 		private float CalculateNormalDistanceBetween(int from, int to) => Vector2.Distance(tilemapModel.IndexToCoordinate(from), tilemapModel.IndexToCoordinate(to));
 
@@ -62,15 +63,27 @@ namespace Controllers.AI
 		{
 			if (tilemapModel.IsFloor(index))
 			{
-				if (tilemapModel.IsIlluminated(index))
+				if (tilemapModel.IsIlluminated(index, out float intensity))
 				{
-					return HighValue;
+					return HighValue * intensity;
 				}
 				return 1;
 			}
 			return int.MaxValue;
 		}
 
+		private float CalculateScaredTileCost(int index)
+		{
+			if (tilemapModel.IsFloor(index))
+			{
+				if (tilemapModel.IsIlluminated(index, out var intensity))
+				{
+					return HighValue * intensity;
+				}
+				return 1;
+			}
+			return int.MaxValue;
+		}
 
 		public UniTask TakeTurnAsync(CancellationToken token)
 		{
@@ -102,7 +115,7 @@ namespace Controllers.AI
 		private bool IsEnemyScared(int i)
 		{
 			var enemyPosition = enemies[i];
-			return tilemapModel.IsIlluminated(enemyPosition.PositionIndex);
+			return tilemapModel.IsIlluminated(enemyPosition.PositionIndex, out _);
 		}
 
 		private void ProcessNormalEnemy(int i)
@@ -113,7 +126,7 @@ namespace Controllers.AI
 			bool IsWalkable(int index)
 			{
 				var entity = tilemapModel.GetEntity(index);
-				if (tilemapModel.IsIlluminated(index))
+				if (tilemapModel.IsIlluminated(index, out _))
 				{
 					return false;
 				}
@@ -186,10 +199,15 @@ namespace Controllers.AI
 			foreach (int tileIndex in tilemapModel.FloorTiles)
 			{
 				var otherEntity = tilemapModel.GetEntity(tileIndex);
-				if (!tilemapModel.IsIlluminated(tileIndex) && (otherEntity == null ||  otherEntity != currentEnemy))
+				if (!tilemapModel.IsIlluminated(tileIndex, out _) && (otherEntity == null ||  otherEntity != currentEnemy))
 				{
 					targetPositions.Add(tileIndex);
 				}
+			}
+
+			foreach (SheepEntityModel sheepEntityModel in sheeps)
+			{
+				targetPositions.Remove(sheepEntityModel.PositionIndex);
 			}
 			ProcessEnemy(i, scaredPathfinder, IsWalkable, targetPositions.ToArray());
 		}

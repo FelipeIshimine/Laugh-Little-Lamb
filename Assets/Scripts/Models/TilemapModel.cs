@@ -184,15 +184,18 @@ namespace Models
 
 		public void RemoveLightBeam(LightBeamModel beamModel) => lightBeamModels.Remove(beamModel);
 
-		public bool IsIlluminated(int index)
+		public bool IsIlluminated(int index, out float intensity)
 		{
 			foreach (LightBeamModel lightBeamModel in lightBeamModels)
 			{
 				if (lightBeamModel.Contains(index))
 				{
+					intensity = 1f - (float)Array.IndexOf(lightBeamModel.Positions, index) / (lightBeamModel.Positions.Length - 1);
 					return true;
 				}
 			}
+
+			intensity = 0;
 			return false;
 		}
 
