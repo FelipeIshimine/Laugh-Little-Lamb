@@ -12,7 +12,7 @@ namespace Controllers.CommandAnimations
 		protected CommandsController CommandsController;
 		protected AnimationQueueSystem AnimationsController;
 		protected TilemapController TilemapController;
-		
+		protected TilemapModel TilemapModel;
 		public void Initialize(CommandsController commandsController,
 		                               Dictionary<EntityModel, EntityView> modelToView,
 		                               AnimationQueueSystem animationQueueSystem,
@@ -22,6 +22,7 @@ namespace Controllers.CommandAnimations
 			this.AnimationsController = animationQueueSystem;
 			this.CommandsController = commandsController;
 			this.ModelToView = modelToView;
+			TilemapModel = tilemapController.Model;
 			Initialize();
 		}
 

@@ -46,9 +46,9 @@ namespace Controllers.Level
 			
 			commandsController.Initialize();
 		
-			tilemapController.Initialize();
 			tilemapModel =	tilemapController.ProcessTileMaps();
 			
+			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
 		
 			sheepsController.Initialize(entitiesController);
@@ -59,12 +59,10 @@ namespace Controllers.Level
 				entitiesController.GetEnemyViews().ToArray(),
 				entitiesController.GetDoorViews().ToArray());
 			
-			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 		}
 
 		public void Terminate()
 		{
-			tilemapController.Terminate();
 			commandsController.Terminate();
 			cameraController.Terminate();
 		}

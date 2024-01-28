@@ -1,4 +1,6 @@
-﻿using Controllers.Commands;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Controllers.Commands;
 
 namespace Controllers.Entities
 {
@@ -6,7 +8,11 @@ namespace Controllers.Entities
 	{
 		public readonly ICommand[] Commands;
 
-		public CompositeCommand(ICommand[] commands)
+		public CompositeCommand(IEnumerable<ICommand> commands)
+		{
+			this.Commands = commands.ToArray();
+		}
+		public CompositeCommand(params ICommand[] commands)
 		{
 			Commands = commands;
 		}

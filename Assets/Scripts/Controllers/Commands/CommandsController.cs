@@ -2,24 +2,41 @@ using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Controllers.Commands
 {
 	public class CommandsController : MonoBehaviour
 	{
-		private Dictionary<Type, CommandBroadcaster> broadcasters = new Dictionary<Type, CommandBroadcaster>();
-		[ShowInInspector,ReadOnly] private readonly Stack<ICommand> historyStack = new Stack<ICommand>();
-		[ShowInInspector,ReadOnly] private readonly Stack<ICommand> redoStack = new Stack<ICommand>();
+		[ShowInInspector,ReadOnly, FoldoutGroup("Debug")] private readonly Stack<ICommand> historyStack = new Stack<ICommand>();
+		[ShowInInspector,ReadOnly, FoldoutGroup("Debug")] private readonly Stack<ICommand> redoStack = new Stack<ICommand>();
 
+		[SerializeField] private InputAction inputUndo;
+		[SerializeField] private InputAction inputRedo;
+		
 		public void Initialize()
 		{
 			historyStack.Clear();
 			redoStack.Clear();
+			inputUndo.performed += InputUndo;
+			inputRedo.performed += InputRedo;
+			inputUndo.Enable();
+			inputRedo.Enable();
 		}
 
+	
 		public void Terminate()
 		{
+			inputUndo.performed -= InputUndo;
+			inputRedo.performed -= InputRedo;
+			inputUndo.Disable();
+			inputRedo.Disable();
 		}
+		
+		private void InputRedo(InputAction.CallbackContext obj) => Redo();
+
+		private void InputUndo(InputAction.CallbackContext obj) => Undo();
+
 
 		public void Do(ICommand command)
 		{

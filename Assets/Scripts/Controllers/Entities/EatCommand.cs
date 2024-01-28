@@ -10,6 +10,7 @@ namespace Controllers.Entities
 		public readonly TilemapModel TilemapModel;
 		public readonly EntitiesController EntitiesController;
 		public readonly int SheepPosition;
+		private TurnLightOffCommand turnLightOff;
 		public EatCommand(EnemyEntityModel enemy, SheepEntityModel sheep, TilemapModel tilemapModel, EntitiesController entitiesController)
 		{
 			Enemy = enemy;
@@ -21,11 +22,15 @@ namespace Controllers.Entities
 
 		protected override void DoAction()
 		{
+			turnLightOff = new TurnLightOffCommand(Sheep, TilemapModel);
+			turnLightOff.Do();
 			EntitiesController.KillSheep(Sheep);
 		}
 
 		protected override void UndoAction()
 		{
+			turnLightOff.Undo();
+			turnLightOff = null;
 			EntitiesController.ReviveSheep(Sheep, SheepPosition);
 		}
 	}
