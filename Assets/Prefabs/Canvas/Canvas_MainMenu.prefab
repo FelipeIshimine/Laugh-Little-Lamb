@@ -948,6 +948,7 @@ GameObject:
   - component: {fileID: 2104639443291115652}
   - component: {fileID: 4939951118818710178}
   - component: {fileID: 2921016602544573498}
+  - component: {fileID: 2469884210309656197}
   m_Layer: 5
   m_Name: Canvas_MainMenu
   m_TagString: Untagged
@@ -1040,6 +1041,20 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 55
+--- !u!114 &2469884210309656197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2514971895046540498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e0bdf1db1f4a859f4fe06476075dd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  quitBtn: {fileID: 4098193684967330398}
+  playBtn: {fileID: 4424755555141125494}
 --- !u!1 &3039731647276806661
 GameObject:
   m_ObjectHideFlags: 0

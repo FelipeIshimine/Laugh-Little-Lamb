@@ -149,7 +149,7 @@ namespace Controllers
 
 		private void OnDrawGizmos()
 		{
-			if (terrainTilemap)
+			if (terrainTilemap && contentTilemap)
 			{
 				Gizmos.color = Color.magenta;
 				terrainTilemap.CompressBounds();
@@ -249,7 +249,7 @@ namespace Controllers
 			}
 
 
-			if ((debugModes & DebugModes.Path) != 0 && tilemapModel != null && pathfinderModel!= null)
+			if ((debugModes & DebugModes.Path) != 0 && tilemapModel != null && pathfinderModel != null)
 			{
 				var fromIndex = tilemapModel.CoordinateToIndex((Vector2Int)terrainTilemap.WorldToCell(from.position));
 				var toIndex = tilemapModel.CoordinateToIndex((Vector2Int)terrainTilemap.WorldToCell(to.position));
@@ -259,7 +259,7 @@ namespace Controllers
 				    toIndex >= 0 && toIndex < tilemapModel.Count)
 				{
 					bool success = TryFindPath(fromIndex, toIndex, ref path);
-					
+
 					//Debug.Log(path.Count);
 					Gizmos.color = success ? Color.yellow : Color.red;
 					if (path != null && path.Count > 0)
@@ -270,16 +270,16 @@ namespace Controllers
 							false);
 					}
 				}
-			}
 
-			if (debugNeighbours >= 0 && debugNeighbours < pathfinderModel.Adjacencies.Count)
-			{
-				Gizmos.color = Color.cyan;
-				var center = terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(debugNeighbours));
-				foreach (var neighbour in pathfinderModel.Adjacencies[debugNeighbours])
+				if (debugNeighbours >= 0 && debugNeighbours < pathfinderModel.Adjacencies.Count)
 				{
-					var other =terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(neighbour));
-					Gizmos.DrawLine(center, other);
+					Gizmos.color = Color.cyan;
+					var center = terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(debugNeighbours));
+					foreach (var neighbour in pathfinderModel.Adjacencies[debugNeighbours])
+					{
+						var other = terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(neighbour));
+						Gizmos.DrawLine(center, other);
+					}
 				}
 			}
 		}
@@ -292,5 +292,10 @@ namespace Controllers
 		}
 		#endregion
 
+		public void SetTileMaps(Tilemap tilemap, Tilemap entitiesTilemap)
+		{
+			terrainTilemap = tilemap;
+			contentTilemap = entitiesTilemap;
+		}
 	}
 }

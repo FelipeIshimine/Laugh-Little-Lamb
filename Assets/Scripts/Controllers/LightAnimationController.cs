@@ -110,6 +110,9 @@ namespace Controllers
 			view.gameObject.SetActive(false);
 		}
 
-		private LightBeamView GetLightBeam() => freeLightBeams.Count == 0 ? Instantiate(lightBeamViewPrefab) : freeLightBeams.Dequeue();
+		private LightBeamView GetLightBeam()
+		{
+			return freeLightBeams.Count == 0 ? Instantiate(lightBeamViewPrefab,transform) : freeLightBeams.Dequeue();
+		}
 	}
 }

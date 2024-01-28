@@ -18,13 +18,16 @@ namespace Controllers.Player
 		private AnimationsController animationsController;
 		private InputController inputController;
 		private Action showMenuCallback;
+		private Action skipLevelCallback;
 
 		public void Initialize(EntitiesController entitiesController,
 		                       CommandsController commandsController,
 		                       AnimationsController animationsController,
 		                       InputController inputController,
-		                       Action showMenuCallback)
+		                       Action showMenuCallback,
+		                       Action skipLevelCallback)
 		{
+			this.skipLevelCallback = skipLevelCallback;
 			this.showMenuCallback = showMenuCallback;
 			this.inputController = inputController;
 			this.animationsController = animationsController;
@@ -47,6 +50,9 @@ namespace Controllers.Player
 			
 			this.inputController.OnWaitEvent += MakeEverySheepWait;
 			this.inputController.OnMenuEvent += ShowMenu;
+			
+			this.inputController.OnSkipLevelEvent += SkipLevel;
+
 		}
 
 		public void Terminate()
@@ -67,9 +73,13 @@ namespace Controllers.Player
 			
 			this.inputController.OnWaitEvent -= MakeEverySheepWait;
 			this.inputController.OnMenuEvent -= ShowMenu;;
+			
+			this.inputController.OnSkipLevelEvent -= SkipLevel;
 
 			
 		}
+
+		private void SkipLevel() => skipLevelCallback?.Invoke();
 
 		private void ShowMenu() => showMenuCallback?.Invoke();
 
