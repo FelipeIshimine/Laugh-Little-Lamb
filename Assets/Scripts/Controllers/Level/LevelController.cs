@@ -150,9 +150,9 @@ namespace Controllers.Level
 			}
 		}
 
-		private bool PlayerLost() => tilemapModel.ActiveSheeps.Count == 0;
+		private bool PlayerLost() => tilemapModel.DeadSheeps.Count > 0;
 
-		private bool PlayerWon() => tilemapModel.SavedSheeps.Count > 0 && tilemapModel.ActiveSheeps.Count == 0;
+		private bool PlayerWon() => tilemapModel.DeadSheeps.Count == 0 && tilemapModel.SavedSheeps.Count > 0 && tilemapModel.ActiveSheeps.Count == 0;
 
 	}
 

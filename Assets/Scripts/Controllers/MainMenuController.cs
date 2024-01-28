@@ -6,6 +6,7 @@ namespace Controllers
 {
 	public class MainMenuController : MonoBehaviour
 	{
+		[SerializeField] private AudioClip playSfx; 
 		[SerializeField] private Button quitBtn; 
 		[SerializeField] private Button playBtn;
 		
@@ -24,7 +25,11 @@ namespace Controllers
 			return result;
 		}
 
-		private void Play() => resultCompletionSource?.TrySetResult(new PlayResult());
+		private void Play()
+		{
+			AudioSource.PlayClipAtPoint(playSfx, Vector3.zero, .2f);
+			resultCompletionSource?.TrySetResult(new PlayResult());
+		}
 
 		private void Quit() => resultCompletionSource?.TrySetResult(new QuitResult());
 

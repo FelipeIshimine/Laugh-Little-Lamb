@@ -8,6 +8,7 @@ namespace Controllers.CommandAnimations
 {
 	public class ExitCommandAnimationController : CommandAnimationController
 	{
+		[SerializeField] private AudioClip audioClip; 
 		[SerializeField] private float animDuration = .5f; 
 		[SerializeField] private AnimationCurve animCurve = AnimationCurve.EaseInOut(0,0,1,1);
 		
@@ -71,6 +72,7 @@ namespace Controllers.CommandAnimations
 				view.transform.localScale = Vector3.LerpUnclamped(startScale,Vector3.zero, animCurve.Evaluate(t));
 				yield return null;
 			} while (t<1);
+			AudioSource.PlayClipAtPoint(audioClip, Vector3.zero);
 		}
 		
 		private IEnumerator AppearAnimation(EntityView view)

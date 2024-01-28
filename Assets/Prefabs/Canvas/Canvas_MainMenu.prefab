@@ -1053,6 +1053,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30e0bdf1db1f4a859f4fe06476075dd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playSfx: {fileID: 8300000, guid: 395af2b499405624d86f2dca92a9e91c, type: 3}
   quitBtn: {fileID: 4098193684967330398}
   playBtn: {fileID: 4424755555141125494}
 --- !u!1 &3039731647276806661
@@ -2020,7 +2021,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 544.44, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &6576565359906687507

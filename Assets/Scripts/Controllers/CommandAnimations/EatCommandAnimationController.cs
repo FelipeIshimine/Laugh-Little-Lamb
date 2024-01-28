@@ -8,6 +8,7 @@ namespace Controllers.CommandAnimations
 {
 	public class EatCommandAnimationController : CommandAnimationController
 	{
+		[SerializeField] private AudioClip deadSheepSfx; 
 		[SerializeField] private float animDuration = .5f; 
 		[SerializeField] private AnimationCurve animCurve = AnimationCurve.EaseInOut(0,0,1,1);
 		
@@ -52,6 +53,7 @@ namespace Controllers.CommandAnimations
 				enemyView.transform.localScale = Vector3.one + Vector3.LerpUnclamped(Vector3.zero,Vector3.one, animCurve.Evaluate(t));
 				yield return null;
 			} while (t<1);
+			AudioSource.PlayClipAtPoint(deadSheepSfx, Vector3.zero);
 		}
 		
 		private IEnumerator UnEatAnimation(EntityView enemyView, EntityView sheepView)

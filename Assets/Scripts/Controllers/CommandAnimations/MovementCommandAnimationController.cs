@@ -2,12 +2,16 @@
 using Controllers.Commands;
 using Controllers.Entities;
 using UnityEngine;
+using UnityEngine.Audio;
 using Views;
 
 namespace Controllers.CommandAnimations
 {
 	public class MovementCommandAnimationController : CommandAnimationController
 	{
+		[SerializeField] private AudioClip lambStepClip; 
+		[SerializeField] private AudioClip enemyStepClip; 
+		
 		[SerializeField] private float animMoveSpeed = 3; 
 		[SerializeField] private AnimationCurve animMoveCurve = AnimationCurve.EaseInOut(0,0,1,1);
 		private CommandListener<MoveCommand> doListener;
@@ -63,7 +67,15 @@ namespace Controllers.CommandAnimations
 			//Debug.Log($"MoveAnimation:{view.name} {endPosition}");
 			view.gameObject.SetActive(true);
 			var startPosition = view.transform.position;
-			
+
+			if (view is EnemyEntityView)
+			{
+				AudioSource.PlayClipAtPoint(enemyStepClip, Vector3.zero);
+			}
+			else if (view is SheepEntityView)
+			{
+				AudioSource.PlayClipAtPoint(lambStepClip, Vector3.zero);
+			}
 			float t = 0;
 			float duration = Vector2.Distance(startPosition, endPosition) / animMoveSpeed; 
 			do
