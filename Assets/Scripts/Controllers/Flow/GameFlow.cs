@@ -7,6 +7,7 @@ namespace Controllers
 	public class GameFlow : MonoBehaviour
 	{
 		[SerializeField] private AssetReference levelScene;
+		[SerializeField] private AssetReference mainMenu;
 		private void Awake()
 		{
 			DontDestroyOnLoad(gameObject);

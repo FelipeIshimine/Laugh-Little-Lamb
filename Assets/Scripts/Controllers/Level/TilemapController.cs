@@ -20,7 +20,9 @@ namespace Controllers
 
 		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> floorTiles;
 		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> wallTiles;
-		[SerializeField, FoldoutGroup("Tiles")] private Tile playerTile;
+		
+		[SerializeField, FoldoutGroup("Tiles")] private List<Tile> playerTiles;
+		
 		[SerializeField, FoldoutGroup("Tiles")] private Tile enemyTile;
 		[SerializeField, FoldoutGroup("Tiles")] private Tile exitTile;
 		
@@ -69,9 +71,10 @@ namespace Controllers
 				{
 					model = new EnemyEntityModel(index);
 				}
-				else if (tile == playerTile)
+				else if (playerTiles.Contains(tile))
 				{
-					model = new SheepEntityModel(index);
+					var tileIndex= playerTiles.IndexOf((Tile)tile);
+					model = new SheepEntityModel(index, (Orientation)(tileIndex + 1));
 				}
 				else if(tile == exitTile)
 				{
