@@ -207,7 +207,18 @@ namespace Controllers.Entities
 
 		public void RemoveSheep(SheepEntityModel sheepModel) => sheepModels.Remove(sheepModel);
 		public void AddSheep(SheepEntityModel sheepModel) => sheepModels.Add(sheepModel);
-		
+
+		public void KillSheep(SheepEntityModel sheep)
+		{
+			tilemapModel.KillSheep(sheep);
+			RemoveSheep(sheep);
+		}
+
+		public void ReviveSheep(SheepEntityModel sheep, int sheepPosition)
+		{
+			tilemapModel.ReviveSheep(sheep, sheepPosition);
+			AddSheep(sheep);
+		}
 	}
 
 }

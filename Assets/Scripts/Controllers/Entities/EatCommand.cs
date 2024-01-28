@@ -21,14 +21,12 @@ namespace Controllers.Entities
 
 		protected override void DoAction()
 		{
-			TilemapModel.RemoveEntity(Sheep);
-			EntitiesController.RemoveSheep(Sheep);
+			EntitiesController.KillSheep(Sheep);
 		}
 
 		protected override void UndoAction()
 		{
-			TilemapModel.AddEntity(Sheep, SheepPosition);
-			EntitiesController.AddSheep(Sheep);
+			EntitiesController.ReviveSheep(Sheep, SheepPosition);
 		}
 	}
 }

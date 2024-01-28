@@ -11,7 +11,11 @@ namespace Models
 		[SerializeField] private List<int> illuminatedTiles;
 		[SerializeField] private EntityModel[] entities;
 		[SerializeField] private BoundsInt bounds;
-
+		
+		[SerializeField] public List<SheepEntityModel> SavedSheeps = new List<SheepEntityModel>();
+		[SerializeField] public List<SheepEntityModel> DeadSheeps = new List<SheepEntityModel>();
+		[SerializeField] public List<SheepEntityModel> ActiveSheeps = new List<SheepEntityModel>();
+		
 		public IReadOnlyList<int> FloorTiles => floorTiles;
 
 		public TilemapModel(BoundsInt bounds, List<int> floorTiles, EntityModel[] entities) 
@@ -20,6 +24,15 @@ namespace Models
 			this.floorTiles = floorTiles;
 			this.entities = entities;
 			illuminatedTiles = new List<int>();
+
+			foreach (EntityModel entityModel in this.entities)
+			{
+				if (entityModel is SheepEntityModel sheepEntityModel)
+				{
+					ActiveSheeps.Add(sheepEntityModel);
+				}
+			}
+			
 		}
 
 		public bool IsFloor(int index) => floorTiles.Contains(index);
@@ -108,7 +121,6 @@ namespace Models
 		
 		public bool IsEmpty(int index) => entities[index] == null;
 
-
 		public void SwapEntities(int startPosition, int endPosition)
 		{
 			(entities[startPosition], entities[endPosition]) = (entities[endPosition], entities[startPosition]);
@@ -144,6 +156,20 @@ namespace Models
 
 		public bool Contains(int targetPosition) => bounds.Contains((Vector3Int)IndexToCoordinate(targetPosition));
 
-	
+		public void KillSheep(SheepEntityModel sheep)
+		{
+			Debug.Log($"KillSheep:{sheep}");
+			RemoveEntity(sheep);
+			ActiveSheeps.Remove(sheep);
+			DeadSheeps.Add(sheep);
+		}
+
+		public void ReviveSheep(SheepEntityModel sheep, int sheepPosition)
+		{
+			Debug.Log($"SheepRevived:{sheep} at {sheepPosition} {IndexToCoordinate(sheepPosition)}");
+			DeadSheeps.Remove(sheep);
+			ActiveSheeps.Add(sheep);
+			AddEntity(sheep, sheepPosition);
+		}
 	}
 }

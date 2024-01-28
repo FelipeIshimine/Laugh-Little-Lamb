@@ -11,12 +11,16 @@ namespace Controllers.Entities
 		public readonly TilemapModel TilemapModel;
 		public readonly MoveCommand MoveCmd;
 		public readonly EatCommand EatCmd;
+		public readonly int SheepPosition;
+		public readonly int EnemyPosition;
 		public MoveAndEatCommand(EnemyEntityModel enemy, SheepEntityModel sheep, TilemapModel tilemapModel,EntitiesController entitiesController)
 		{
 			EntitiesController = entitiesController;
 			TilemapModel = tilemapModel;
 			Enemy = enemy;
 			Sheep = sheep;
+			SheepPosition = sheep.PositionIndex; 
+			EnemyPosition = enemy.PositionIndex; 
 			MoveCmd = new MoveCommand(enemy, tilemapModel, sheep.PositionIndex);
 			EatCmd = new EatCommand(enemy, sheep, tilemapModel, entitiesController);
 		}
@@ -24,13 +28,15 @@ namespace Controllers.Entities
 		protected override void DoAction()
 		{
 			MoveCmd.Do();
-			TilemapModel.SwapEntities(Sheep.PositionIndex, Enemy.PositionIndex);
+			TilemapModel.SwapEntities(SheepPosition, EnemyPosition);
 			EatCmd.Do();
+			TilemapModel.SwapEntities(SheepPosition, EnemyPosition);
 		}
 		protected override void UndoAction()
 		{
+			TilemapModel.SwapEntities(SheepPosition, EnemyPosition);
 			EatCmd.Undo();
-			TilemapModel.SwapEntities(Sheep.PositionIndex, Enemy.PositionIndex);
+			TilemapModel.SwapEntities(SheepPosition, EnemyPosition);
 			MoveCmd.Undo();
 		}
 	}

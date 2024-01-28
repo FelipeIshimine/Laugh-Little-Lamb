@@ -194,6 +194,7 @@ namespace Pathfinding
 			}
 
 
+			/*
 			StringBuilder builder = new StringBuilder();
 
 			builder.Append("Start Positions:");
@@ -209,7 +210,7 @@ namespace Pathfinding
 			{
 				builder.Append($"{i} ");
 			}
-			Debug.Log(builder);
+			Debug.Log(builder);*/
 			return success;
 		}
 	}
