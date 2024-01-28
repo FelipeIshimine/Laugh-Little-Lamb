@@ -23,10 +23,14 @@ namespace Controllers.Entities
 		{
 			Model.RemoveEntity(SheepModel);
 			EntitiesController.RemoveSheep(SheepModel);
+			Model.SavedSheeps.Add(SheepModel);
+			Model.ActiveSheeps.Remove(SheepModel);
 		}
 
 		protected override void UndoAction()
 		{
+			Model.ActiveSheeps.Add(SheepModel);
+			Model.SavedSheeps.Remove(SheepModel);
 			EntitiesController.AddSheep(SheepModel);
 			Model.AddEntity(SheepModel, StartPosition);
 		}

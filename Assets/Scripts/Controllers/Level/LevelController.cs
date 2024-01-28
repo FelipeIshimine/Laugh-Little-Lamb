@@ -9,15 +9,14 @@ using Controllers.Entities;
 using Controllers.Player;
 using Cysharp.Threading.Tasks;
 using Models;
-using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Controllers.Level
 {
 	public partial class LevelController : MonoBehaviour
 	{
-		private Action<Result> resultCallback;
-		
+		private UniTaskCompletionSource<Result> resultCompletionSource;
 		[SerializeField] private TilemapController tilemapController;
 		[SerializeField] private CommandsController commandsController;
 		
@@ -28,22 +27,25 @@ namespace Controllers.Level
 		[SerializeField] private CameraController cameraController;
 		[SerializeField] private AnimationsController animationsController;
 		[SerializeField] private InputController inputController;
+		
+		[SerializeField] private GameOverController gameOverController;
 
 		[SerializeField] private TilemapModel tilemapModel;
 		
-
-		public IPlayer[] players;
-		private async UniTaskVoid Awake()
+		private async UniTaskVoid Start()
 		{
-			Initialize(null);
-			
-			await GameLoop(destroyCancellationToken);
+			if(GameFlow.Instance == null)
+			{
+				await Run(null,null);
+			}
 		}
 
-		[Button]
-		public void Initialize(Action<Result> callback)
+		private void Initialize(Tilemap terrainTilemap, Tilemap entitiesTilemap)
 		{
-			resultCallback = callback;
+			if (terrainTilemap != null && entitiesTilemap != null)
+			{
+				tilemapController.SetTileMaps(terrainTilemap,entitiesTilemap);
+			}
 			
 			inputController.Initialize();
 			inputController.gameObject.SetActive(false);
@@ -55,39 +57,58 @@ namespace Controllers.Level
 			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
 		
-			sheepsController.Initialize(entitiesController, commandsController, animationsController, inputController, ShowMenu);
+			sheepsController.Initialize(entitiesController, commandsController, animationsController, inputController, ShowMenu, SkipLevel);
 			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController, commandsController);
 			
 			cameraController.Initialize(
 				entitiesController.GetSheepViews().ToArray(),
 				entitiesController.GetEnemyViews().ToArray(),
 				entitiesController.GetDoorViews().ToArray());
-			
 		}
 
-		private void ShowMenu()
-		{
-			Debug.Log("Show Menu");
-		}
+		private void SkipLevel() => resultCompletionSource?.TrySetResult(new WinResult());
+
+		private void ShowMenu() => resultCompletionSource?.TrySetResult(new QuitResult());
 
 		public void Terminate()
 		{
 			inputController.Terminate();
 			commandsController.Terminate();
 			cameraController.Terminate();
+			
+			animationsController.Terminate();
+			//entitiesController.Terminate();
+		
+			sheepsController.Terminate();
+			//enemyAiController.Terminate();
 		}
 
-	
-
-		public async UniTask GameLoop(CancellationToken token)
+		public async UniTask<Result> Run(Tilemap terrainTilemap, Tilemap entitiesTilemap)
 		{
-			players = new IPlayer[]
+			Debug.Log("Level Run");
+			Initialize(terrainTilemap, entitiesTilemap);
+			resultCompletionSource = new UniTaskCompletionSource<Result>();
+			
+			GameLoop(destroyCancellationToken).Forget();
+
+			var result = await resultCompletionSource.Task;
+
+			Terminate();
+
+			return result;
+		}
+
+
+		private async UniTaskVoid GameLoop(CancellationToken token)
+		{
+			var players = new IPlayer[]
 			{
 				sheepsController,
 				enemyAiController
 			};
-			
-			while (true)
+
+			bool canContinue = true;
+			while (canContinue)
 			{
 				if (gameObject == null)
 				{
@@ -99,20 +120,48 @@ namespace Controllers.Level
 					await player.TakeTurnAsync(token);
 					while (animationsController.IsPlaying)
 					{
-						//Debug.Log("Waiting for AnimationSystem");
 						await Task.Yield();
+					}
+
+					if (PlayerWon())
+					{
+						resultCompletionSource?.TrySetResult(new WinResult());
+						canContinue = false;
+						break;
+					}
+
+					if (PlayerLost())
+					{
+						switch (await gameOverController.Run())
+						{
+							case GameOverController.RestartResult:
+								resultCompletionSource?.TrySetResult(new RestartResult());
+								break;
+							case GameOverController.QuitResult:
+								resultCompletionSource?.TrySetResult(new QuitResult());
+								break;
+							default:
+								throw new ArgumentOutOfRangeException();
+						}
+						canContinue = false;
+						break;
 					}
 				}
 			}
 		}
+
+		private bool PlayerLost() => tilemapModel.ActiveSheeps.Count == 0;
+
+		private bool PlayerWon() => tilemapModel.SavedSheeps.Count > 0 && tilemapModel.ActiveSheeps.Count == 0;
+
 	}
 
 	public partial class LevelController
 	{
-		[System.Serializable] public abstract class Result { }
-		[System.Serializable] public class Quit : Result { }
-		[System.Serializable] public class Win : Result { }
-		[System.Serializable] public class Lose : Result { }
+		[Serializable] public abstract class Result { }
+		[Serializable] public class QuitResult : Result { }
+		[Serializable] public class WinResult : Result { }
+		[Serializable] public class RestartResult : Result { }
 	}
 }
 

@@ -198,7 +198,7 @@ namespace Controllers.AI
 
 		private void ProcessScaredEnemy(int i)
 		{
-			Debug.Log("ProcessScaredEnemy");
+			//Debug.Log("ProcessScaredEnemy");
 			int enemyIndex = i;
 			bool IsWalkable(int index)
 			{

@@ -55,7 +55,8 @@ namespace Controllers.Entities
 					var view = Instantiate(
 						treeViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
-						Quaternion.identity);
+						Quaternion.identity, 
+						transform);
 
 					view.name = $"Tree {treeModels.Count}";
 					modelToView.Add(entity, view);
@@ -66,7 +67,8 @@ namespace Controllers.Entities
 					var view = Instantiate(
 						enemyViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
-						Quaternion.identity);
+						Quaternion.identity,
+						transform);
 					view.name = $"Enemy {enemyModels.Count}";
 					modelToView.Add(entity, view);
 				}
@@ -76,8 +78,8 @@ namespace Controllers.Entities
 					var view = Instantiate(
 						sheepViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
-						Quaternion.identity);
-					
+						Quaternion.identity,		
+						transform);
 					sheepModel.LookDirection.OnUpdate += x =>
 					{
 						if(x != Orientation.None)
@@ -93,7 +95,8 @@ namespace Controllers.Entities
 					var view = Instantiate(
 						doorViewPrefab,
 						GetWorldPosition(entity.PositionIndex),
-						Quaternion.identity);
+						Quaternion.identity,			
+						transform);
 					view.SetOpen(true);
 					view.name = $"Door {doorModels.Count}";
 					modelToView.Add(entity, view);
