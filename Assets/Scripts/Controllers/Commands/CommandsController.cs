@@ -10,33 +10,19 @@ namespace Controllers.Commands
 	{
 		[ShowInInspector,ReadOnly, FoldoutGroup("Debug")] private readonly Stack<ICommand> historyStack = new Stack<ICommand>();
 		[ShowInInspector,ReadOnly, FoldoutGroup("Debug")] private readonly Stack<ICommand> redoStack = new Stack<ICommand>();
+		public Stack<ICommand> HistoryStack => historyStack;
+		public Stack<ICommand> RedoStack => redoStack;
 
-		[SerializeField] private InputAction inputUndo;
-		[SerializeField] private InputAction inputRedo;
-		
 		public void Initialize()
 		{
 			historyStack.Clear();
 			redoStack.Clear();
-			inputUndo.performed += InputUndo;
-			inputRedo.performed += InputRedo;
-			inputUndo.Enable();
-			inputRedo.Enable();
 		}
 
 	
 		public void Terminate()
 		{
-			inputUndo.performed -= InputUndo;
-			inputRedo.performed -= InputRedo;
-			inputUndo.Disable();
-			inputRedo.Disable();
 		}
-		
-		private void InputRedo(InputAction.CallbackContext obj) => Redo();
-
-		private void InputUndo(InputAction.CallbackContext obj) => Undo();
-
 
 		public void Do(ICommand command)
 		{
@@ -62,7 +48,7 @@ namespace Controllers.Commands
 		}
 
 		[Button]
-		public void Undo()
+		public ICommand Undo()
 		{
 			if (historyStack.Count > 0)
 			{
@@ -70,7 +56,9 @@ namespace Controllers.Commands
 				//Debug.Log($"Undo:{command}");
 				redoStack.Push(command);
 				command.Undo();
+				return command;
 			}
+			return null;
 		}
 
 		[Button("UndoX2")]
@@ -84,6 +72,22 @@ namespace Controllers.Commands
 		{
 			for (int i = 0; i < 2; i++) Redo();
 		}
+
+		public void Undo<T>() where T : ICommand
+		{
+			do
+			{
+				Undo();
+			} while (historyStack.Count > 0 && (!redoStack.TryPeek(out var result) || result is not T));
+		}
+		public void Redo<T>() where T : ICommand
+		{
+			while(redoStack.Count > 0 && (!historyStack.TryPeek(out var result) || result is not T))
+			{
+				Redo();
+			} 
+		}
+		
 	}
 
 	public abstract class CommandListener : IComparable<CommandListener> 
