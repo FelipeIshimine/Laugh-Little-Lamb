@@ -1,105 +1,163 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using Controllers.CommandAnimations;
 using Controllers.Commands;
 using Controllers.Entities;
 using Cysharp.Threading.Tasks;
 using Models;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Controllers.Player
 {
 	internal class SheepsController : MonoBehaviour, IPlayer
 	{
-		[SerializeField]private UnityEngine.InputSystem.InputAction upInput;
-		[SerializeField]private UnityEngine.InputSystem.InputAction downInput;
-		[SerializeField]private UnityEngine.InputSystem.InputAction leftInput;
-		[SerializeField]private UnityEngine.InputSystem.InputAction rightInput;
 		private EntitiesController entitiesController;
 
-		private TaskCompletionSource<Orientation> orientationTcs;
+		private UniTaskCompletionSource turnCompleteSource;
 		private CommandsController commandsController;
-		public void Initialize(EntitiesController entitiesController, CommandsController commandsController)
+		private AnimationsController animationsController;
+		private InputController inputController;
+		private Action showMenuCallback;
+
+		public void Initialize(EntitiesController entitiesController,
+		                       CommandsController commandsController,
+		                       AnimationsController animationsController,
+		                       InputController inputController,
+		                       Action showMenuCallback)
 		{
+			this.showMenuCallback = showMenuCallback;
+			this.inputController = inputController;
+			this.animationsController = animationsController;
 			this.commandsController = commandsController;
 			this.entitiesController = entitiesController;
+
+
+			this.inputController.OnMoveUpEvent += OnMoveUp;
+			this.inputController.OnMoveDownEvent += OnMoveDown;
+			this.inputController.OnMoveLeftEvent += OnMoveLeft;
+			this.inputController.OnMoveRightEvent += OnMoveRight;
+			
+			this.inputController.OnLookUpEvent += OnLookUp;
+			this.inputController.OnLookDownEvent += OnLookDown;
+			this.inputController.OnLookLeftEvent += OnLookLeft;
+			this.inputController.OnLookRightEvent += OnLookRight;
+			
+			this.inputController.OnUndoEvent += UndoTurn;
+			this.inputController.OnDoEvent += RedoTurn;
+			
+			this.inputController.OnWaitEvent += MakeEverySheepWait;
+			this.inputController.OnMenuEvent += ShowMenu;
 		}
 
-		private void Awake()
+		public void Terminate()
 		{
-			upInput.performed += OnUpInputOnperformed;
-			downInput.performed += OnDownInputOnperformed;
-			leftInput.performed += OnLeftInputOnperformed;
-			rightInput.performed += OnRightInputOnperformed;
+			
+			inputController.OnMoveUpEvent -= OnMoveUp;
+			inputController.OnMoveDownEvent -= OnMoveDown;
+			inputController.OnMoveLeftEvent -= OnMoveLeft;
+			inputController.OnMoveRightEvent -= OnMoveRight;
+			
+			inputController.OnLookUpEvent -= OnLookUp;
+			inputController.OnLookDownEvent -= OnLookDown;
+			inputController.OnLookLeftEvent -= OnLookLeft;
+			inputController.OnLookRightEvent -= OnLookRight;
+			
+			this.inputController.OnUndoEvent -= UndoTurn;
+			this.inputController.OnDoEvent -= RedoTurn;
+			
+			this.inputController.OnWaitEvent -= MakeEverySheepWait;
+			this.inputController.OnMenuEvent -= ShowMenu;;
+
+			
 		}
 
-		private void OnDestroy()
+		private void ShowMenu() => showMenuCallback?.Invoke();
+
+		private void OnLookUp() => OnLook(Orientation.Up);
+		private void OnLookDown() => OnLook(Orientation.Down);
+		private void OnLookLeft() => OnLook(Orientation.Left);
+		private void OnLookRight() => OnLook(Orientation.Right);
+
+		private void OnLook(Orientation orientation)
 		{
-			upInput.performed -= OnUpInputOnperformed;
-			downInput.performed -= OnDownInputOnperformed;
-			leftInput.performed -= OnLeftInputOnperformed;
-			rightInput.performed -= OnRightInputOnperformed;            
+			entitiesController.LookTogether(entitiesController.SheepEntityModels, orientation);
+			inputController.gameObject.SetActive(false);
+			turnCompleteSource.TrySetResult();
 		}
 
-		private void OnDisable()
+		private void OnMoveUp() => MoveEverySheep(Orientation.Up);  
+		private void OnMoveDown() => MoveEverySheep(Orientation.Down);  
+		private void OnMoveLeft() => MoveEverySheep(Orientation.Left);  
+		private void OnMoveRight() => MoveEverySheep(Orientation.Right);
+
+		private void MoveEverySheep(Orientation orientation)
 		{
-			downInput.Disable();
-			leftInput.Disable();
-			rightInput.Disable();
-			upInput.Disable();
+			entitiesController.MoveTogether(entitiesController.SheepEntityModels, orientation);
+			inputController.gameObject.SetActive(false);
+			turnCompleteSource.TrySetResult();
 		}
 
-		private void OnEnable()
+		private void MakeEverySheepWait()
 		{
-			upInput.Enable();
-            downInput.Enable();
-			leftInput.Enable();
-            rightInput.Enable();
+			entitiesController.Wait(entitiesController.SheepEntityModels);
+			inputController.gameObject.SetActive(false);
+			turnCompleteSource.TrySetResult();
 		}
-
-		private void SetResult(Orientation orientation)
-		{
-			Debug.Log(orientation);
-			orientationTcs?.SetResult(orientation);
-		}
-
-		private void OnRightInputOnperformed(InputAction.CallbackContext inputAction)
-		{
-			if (inputAction.performed)
-			{
-				SetResult(Orientation.Right);
-			}
-		}
-
-		private void OnLeftInputOnperformed(InputAction.CallbackContext inputAction)
-		{
-			if (inputAction.performed) SetResult(Orientation.Left);
-		}
-
-		private void OnDownInputOnperformed(InputAction.CallbackContext inputAction)
-		{
-			if (inputAction.performed)	SetResult(Orientation.Down);
-		}
-
-		private void OnUpInputOnperformed(InputAction.CallbackContext inputAction)
-		{
-			if (inputAction.performed) SetResult(Orientation.Up);
-		}
-
+		
 		public async UniTask TakeTurnAsync(CancellationToken token)
 		{
 			commandsController.Do(new SheepTurnStart());
 			
+			inputController.gameObject.SetActive(true);
+			
             gameObject.SetActive(true);
-			Debug.Log("Player Turn Start");
-			orientationTcs = new TaskCompletionSource<Orientation>();
-			var result = await orientationTcs.Task;
-			entitiesController.MoveTogether(entitiesController.SheepEntityModels,result);
-			Debug.Log("Player Turn End");
+			turnCompleteSource = new UniTaskCompletionSource();
+			await turnCompleteSource.Task;
             gameObject.SetActive(false);
             
+            inputController.gameObject.SetActive(false);
+
             commandsController.Do(new SheepTurnEnd());
 		}
 
+		public async void UndoTurn()
+		{
+			if (animationsController.IsPlaying)
+			{
+				return;
+			}
+			if (commandsController.HistoryStack.TryPeek(out var result) && result is SheepTurnStart)
+			{
+				commandsController.Undo();
+			}
+			commandsController.Undo<SheepTurnStart>();
+
+			Time.timeScale = 3;
+			while (animationsController.IsPlaying)
+			{
+				await UniTask.NextFrame();
+			}
+			Time.timeScale = 1;
+		}
+
+		public async void RedoTurn()
+		{
+			if (animationsController.IsPlaying)
+			{
+				return;
+			}
+			if (commandsController.RedoStack.TryPeek(out var result) && result is SheepTurnStart)
+			{
+				commandsController.Redo();
+			}
+			commandsController.Redo<SheepTurnStart>();
+			
+			Time.timeScale = 3;
+			while (animationsController.IsPlaying)
+			{
+				await UniTask.NextFrame();
+			}
+			Time.timeScale = 1;
+		}
 	}
 }

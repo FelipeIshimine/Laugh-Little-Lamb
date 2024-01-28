@@ -41,7 +41,7 @@ namespace Controllers
 
 		private void OnDoTurnOff(TurnLightOffCommand command)
 		{
-			Debug.Log("OnDo>TurnOff");
+			//Debug.Log("OnDo>TurnOff");
 			LightBeamView view = activeLightBeams[command.LightBeam];
 			
 			List<object> participants = new List<object>();
@@ -74,7 +74,7 @@ namespace Controllers
 
 		private void OnDoTurnOn(TurnLightOnCommand command)
 		{
-			Debug.Log("OnDo>TurnOn");
+			//Debug.Log("OnDo>TurnOn");
 			LightBeamView view = GetLightBeam();
 			view.gameObject.SetActive(true);
 			List<object> participants = new List<object>();
@@ -91,7 +91,7 @@ namespace Controllers
 		
 		private void OnUndoTurnOn(TurnLightOnCommand command)
 		{
-			Debug.Log("OnUndo<TurnOn");
+			//Debug.Log("OnUndo<TurnOn");
 			LightBeamView view = activeLightBeams[command.LightBeam];
 			
 			List<object> participants = new List<object>();

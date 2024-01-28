@@ -34,6 +34,8 @@ namespace Controllers.Entities
 
 		private TilemapController tilemapController;
 
+		[SerializeField] private int lightLength = 3;
+		
 		public void Initialize(CommandsController commands, TilemapModel model, TilemapController tilemapController)
 		{
 			this.tilemapController = tilemapController;
@@ -99,7 +101,7 @@ namespace Controllers.Entities
 			List<TurnLightOnCommand> turnOnLightsCommands = new List<TurnLightOnCommand>();
 			foreach (SheepEntityModel sheepEntityModel in sheepModels)
 			{
-				turnOnLightsCommands.Add(new TurnLightOnCommand(sheepEntityModel, tilemapModel));
+				turnOnLightsCommands.Add(new TurnLightOnCommand(sheepEntityModel, tilemapModel, lightLength));
 			}
 			commandsController.Do(new CompositeCommand(turnOnLightsCommands));
 		}
@@ -114,7 +116,7 @@ namespace Controllers.Entities
 
 			if (direction == Orientation.None)
 			{
-				return new WaitCommand();
+				return new WaitCommand(entityModel);
 			}
 			
 			var targetCoordinate = coordinate + direction.ToVector2Int();
@@ -138,7 +140,7 @@ namespace Controllers.Entities
 						tilemapModel,
 						direction,
 						targetPosition),
-						new TurnLightOnCommand(sheepEntityModel, tilemapModel)
+						new TurnLightOnCommand(sheepEntityModel, tilemapModel, lightLength)
 						);
 				}
 				if (entityModel is EnemyEntityModel enemyEntityModel && targetEntity is SheepEntityModel sheep)
@@ -158,7 +160,7 @@ namespace Controllers.Entities
 						playerEntityModel,
 						direction);
 				}
-				return new WaitCommand();
+				return new WaitCommand(entityModel);
 			}
 		}
 
@@ -185,8 +187,23 @@ namespace Controllers.Entities
 				Debug.Log(commands[i]);
 			}
 			commandsController.Do(new CompositeCommand(commands.ToArray()));
-			
 		}
+		
+		public void LookTogether(IReadOnlyList<SheepEntityModel> sheep, Orientation orientation)
+		{
+			List<CompositeCommand> commands = new List<CompositeCommand>();
+			foreach (var entityModel in sheep)
+			{
+				commands.Add(
+					new CompositeCommand(
+						new TurnLightOffCommand(entityModel, tilemapModel),
+					new LookCommand(entityModel, orientation),
+						new TurnLightOnCommand(entityModel, tilemapModel, lightLength)
+					));
+			}
+			commandsController.Do(new CompositeCommand(commands));
+		}
+		
 		public void MoveTogether<T>(IEnumerable<T> entityModels, Orientation direction) where T : EntityModel, IMove
 		{
 			MoveTogether<T>(Array.ConvertAll(entityModels.ToArray(),x=>(x,direction)));
@@ -197,6 +214,8 @@ namespace Controllers.Entities
 			CompositeCommand command = new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateCommand(x.Entity, x.Direction)));
 			commandsController.Do(command);
 		}
+		
+		
 		
 		public void Move(EntityModel model, Orientation moveDirection) => commandsController.Do(CreateCommand(model, moveDirection));
 
@@ -228,6 +247,18 @@ namespace Controllers.Entities
 			tilemapModel.ReviveSheep(sheep, sheepPosition);
 			AddSheep(sheep);
 		}
+
+		public void Wait(IReadOnlyList<EntityModel> entityModels)
+		{
+			List<WaitCommand> commands = new List<WaitCommand>();
+			foreach (var entity in entityModels)
+			{
+				commands.Add(new WaitCommand(entity));
+			}
+			commandsController.Do(new CompositeCommand(commands));
+		}
+
+		
 	}
 
 }

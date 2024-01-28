@@ -12,7 +12,7 @@ namespace Controllers.Entities
 		public readonly int LightLength;
 		public LightBeamModel LightBeam;
 
-		public TurnLightOnCommand(SheepEntityModel sourceEntity, TilemapModel tilemapModel, int lightLength = 3)
+		public TurnLightOnCommand(SheepEntityModel sourceEntity, TilemapModel tilemapModel, int lightLength)
 		{
 			LightLength = lightLength;
 			this.TilemapModel = tilemapModel;

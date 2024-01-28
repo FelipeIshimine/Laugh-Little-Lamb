@@ -153,9 +153,18 @@ namespace Models
 			{
 				coordinate += offset;
 				int index = CoordinateToIndex(coordinate);
-				if (bounds.Contains((Vector3Int)coordinate) && IsEmpty(index))
+
+				if(bounds.Contains((Vector3Int)coordinate))
 				{
-					positions.Add(index);
+					var otherEntity = GetEntity(index);
+					if (otherEntity is not TreeEntityModel)
+					{
+						positions.Add(index);
+					}
+					else
+					{
+						break;
+					}
 				}
 				else
 				{

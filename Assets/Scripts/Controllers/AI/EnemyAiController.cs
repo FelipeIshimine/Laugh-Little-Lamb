@@ -21,6 +21,7 @@ namespace Controllers.AI
 		private TilemapModel tilemapModel;
 		
 		private PathfinderModel normalPathfinder;
+		private PathfinderModel scaredPathfinder;
 
 		private int HighValue;
 		private List<int> path = new List<int>();
@@ -41,6 +42,13 @@ namespace Controllers.AI
 			HighValue = Mathf.CeilToInt(Mathf.Sqrt(tilemapModel.Count*2));
 			
 			normalPathfinder = new PathfinderModel(
+				this.tilemapModel.Count, 
+				x=>this.tilemapModel.GetNeighbours(x).ToArray(),
+				this.tilemapModel.IsFloor,
+				CalculateNormalTileCost,
+				CalculateNormalDistanceBetween);
+			
+			scaredPathfinder = new PathfinderModel(
 				this.tilemapModel.Count, 
 				x=>this.tilemapModel.GetNeighbours(x).ToArray(),
 				this.tilemapModel.IsFloor,
@@ -74,58 +82,15 @@ namespace Controllers.AI
 			{
 				for (int move = 0; move < moveSpeed; move++)
 				{
-					normalPathfinder.CalculateAdjacencies();
-					normalPathfinder.CalculateCosts();
-					Orientation moveDirection;
-
-					var enemyIndex = i;
-					bool IsWalkable(int index)
+					if (IsEnemyScared(i))
 					{
-						var entity = tilemapModel.GetEntity(index);
-						return entity == null || entity is SheepEntityModel || entity == enemies[enemyIndex];
-					}
-
-					int[] targetPositions = new int[sheeps.Count];
-					for (var index = 0; index < sheeps.Count; index++)
-					{
-						targetPositions[index] = sheeps[index].PositionIndex;
-					}
-					
-					var enemyEntityModel = enemies[i];
-					Pathfinding.AStar.TryFindMultiPath(
-						enemyEntityModel.PositionIndex,
-						targetPositions,
-						IsWalkable,
-						index => normalPathfinder.GetNeighbours(index),
-						index => normalPathfinder.GetDistance(enemyEntityModel.PositionIndex, index),
-						normalPathfinder.GetCost,
-						normalPathfinder.Length,
-						ref path,
-						out var pathCost,
-						HighValue);
-
-					if (path.Count > 1)
-					{
-						var startColor = Color.blue;
-						var endColor = Color.red;
-
-						for (int j = 0; j < path.Count - 1; j++)
-						{
-							Debug.DrawLine(
-								tilemapController.GetWorldPosition(path[j]),
-								tilemapController.GetWorldPosition(path[j + 1]),
-								Color.Lerp(startColor, endColor, (float)j / (path.Count - 1)));
-						}
-
-						Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
-						var offset = tilemapModel.IndexToCoordinate(path[1]) - tilemapModel.IndexToCoordinate(path[0]);
-						moveDirection = OffsetToOrientation(offset);
+						ProcessScaredEnemy(i);
 					}
 					else
 					{
-						moveDirection = Orientation.None;
+						ProcessNormalEnemy(i);
 					}
-					entitiesController.Move(enemies[enemyIndex], moveDirection);
+					//Debug.Break();
 				}
 			}
 
@@ -134,6 +99,100 @@ namespace Controllers.AI
 			return UniTask.CompletedTask;
 		}
 
+		private bool IsEnemyScared(int i)
+		{
+			var enemyPosition = enemies[i];
+			return tilemapModel.IsIlluminated(enemyPosition.PositionIndex);
+		}
+
+		private void ProcessNormalEnemy(int i)
+		{
+			//Debug.Log($"Process Normal Enemy {i}");
+			var enemyIndex = i;
+	
+			bool IsWalkable(int index)
+			{
+				var entity = tilemapModel.GetEntity(index);
+				if (tilemapModel.IsIlluminated(index))
+				{
+					return false;
+				}
+				return entity == null || entity is SheepEntityModel || entity == enemies[enemyIndex];
+			}
+			
+			int[] targetPositions = new int[sheeps.Count];
+			for (var index = 0; index < sheeps.Count; index++)
+			{
+				targetPositions[index] = sheeps[index].PositionIndex;
+			}
+			
+			ProcessEnemy(i, normalPathfinder, IsWalkable,targetPositions);
+		}
+
+		private void ProcessEnemy(int i, PathfinderModel pathFinderModel, Predicate<int> isWalkable, int[] targetPositions)
+		{
+			pathFinderModel.CalculateAdjacencies();
+			pathFinderModel.CalculateCosts();
+			Orientation moveDirection;
+					
+			var enemyEntityModel = enemies[i];
+			Pathfinding.AStar.TryFindMultiPath(
+				enemyEntityModel.PositionIndex,
+				targetPositions,
+				isWalkable,
+				index => pathFinderModel.GetNeighbours(index),
+				index => pathFinderModel.GetDistance(enemyEntityModel.PositionIndex, index),
+				pathFinderModel.GetCost,
+				pathFinderModel.Length,
+				ref path,
+				out var pathCost);
+
+			if (path.Count > 1)
+			{
+				var startColor = Color.blue;
+				var endColor = Color.red;
+
+				for (int j = 0; j < path.Count - 1; j++)
+				{
+					Debug.DrawLine(
+						tilemapController.GetWorldPosition(path[j]),
+						tilemapController.GetWorldPosition(path[j + 1]),
+						Color.Lerp(startColor, endColor, (float)j / (path.Count - 1)));
+				}
+
+				Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
+				var offset = tilemapModel.IndexToCoordinate(path[1]) - tilemapModel.IndexToCoordinate(path[0]);
+				moveDirection = OffsetToOrientation(offset);
+			}
+			else
+			{
+				moveDirection = Orientation.None;
+			}
+			entitiesController.Move(enemies[i], moveDirection);
+		}
+
+		private void ProcessScaredEnemy(int i)
+		{
+			Debug.Log("ProcessScaredEnemy");
+			int enemyIndex = i;
+			bool IsWalkable(int index)
+			{
+				var entity = tilemapModel.GetEntity(index);
+				return entity == null || entity == enemies[enemyIndex];
+			}
+			
+			List<int> targetPositions = new List<int>(tilemapModel.FloorTiles);
+
+			foreach (var lightBeamModel in tilemapModel.LightBeamModels)
+			{
+				foreach (var position in lightBeamModel.Positions)
+				{
+					targetPositions.Remove(position);
+				}
+			}
+			
+			ProcessEnemy(i, scaredPathfinder, IsWalkable, targetPositions.ToArray());
+		}
 
 
 		private Orientation OffsetToOrientation(Vector2Int offset)
