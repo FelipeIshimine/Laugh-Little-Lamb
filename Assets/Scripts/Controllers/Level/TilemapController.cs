@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Controllers.Commands;
+using Controllers.Entities;
 using Models;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -30,6 +33,24 @@ namespace Controllers
 		[SerializeField, FoldoutGroup("Debug")] private List<int> path;
 		[SerializeField, FoldoutGroup("Debug")] private int debugNeighbours = 0;
 		[SerializeField, FoldoutGroup("Debug")] private DebugModes debugModes;
+		private CommandListener<MoveCommand> doListener;
+		private CommandListener<MoveCommand> undoListener;
+		public void Initialize()
+		{
+			doListener = MoveCommand.OnDo.AddListener(MoveCmdDo);
+			undoListener = MoveCommand.OnUndo.AddListener(MoveCmdDo);
+		}
+
+		public void Terminate()
+		{
+				MoveCommand.OnDo.RemoveListener(doListener);
+				MoveCommand.OnUndo.RemoveListener(undoListener);
+		}
+		
+		private void MoveCmdDo(MoveCommand obj)
+		{
+			tilemapModel.CalculateLights();
+		}
 
 		[Button]
 		public TilemapModel ProcessTileMaps()
@@ -88,6 +109,8 @@ namespace Controllers
 				CalculatedDistance);
 			
 			 contentTilemap.gameObject.SetActive(false);
+			 
+
 			 return tilemapModel;
 		}
 
@@ -99,6 +122,42 @@ namespace Controllers
 				tilemapModel.IndexToCoordinate(toIndex));
 
 		[Button] public EntityModel GetContent(int index) => tilemapModel.GetEntity(index);
+
+		public bool TryFindPath(int fromIndex, int toIndex, ref List<int> resultPath)
+		{
+			return Pathfinding.AStar.TryFindPath(
+				fromIndex, 
+				toIndex,
+				tilemapModel.IsEmpty,
+				pathfinderModel.GetNeighbours,
+				x => pathfinderModel.GetDistance(toIndex,x),
+				tilemapModel.Count,
+				ref resultPath,		
+				out _);
+		}
+
+	
+		public Vector3 GetWorldPosition(int positionIndex) => terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(positionIndex));
+		public Vector3 GetWorldPosition(Vector2Int coordinate) => terrainTilemap.GetCellCenterWorld((Vector3Int)coordinate);
+		
+		
+		
+		
+		[Flags]
+		
+		public enum DebugModes
+		{
+			None = 0,
+			Index = 1,
+			Coordinates = 2,
+			WalkableTiles = 4,
+			Adjacencies = 8,
+			Path = 16,
+			Entity = 32,
+			Light = 64,
+		}
+
+		#region DrawGizmos
 
 		private void OnDrawGizmos()
 		{
@@ -154,6 +213,19 @@ namespace Controllers
 					var color = new Color(0,1,0,.5f);
 					Gizmos.color = color;
 					foreach (int index in tilemapModel.FloorTiles)
+					{
+						var coordinate = tilemapModel.IndexToCoordinate(index);
+						terrainTilemap.GetCellCenterWorld(coordinate);
+						var center = terrainTilemap.GetCellCenterWorld(coordinate);
+						Gizmos.DrawCube(center, Vector3.one);
+					}
+				}
+				
+				if (tilemapModel != null && (debugModes & DebugModes.Light) != 0)
+				{
+					var color = new Color(1,1,0,.65f);
+					Gizmos.color = color;
+					foreach (int index in tilemapModel.IlluminatedTiles)
 					{
 						var coordinate = tilemapModel.IndexToCoordinate(index);
 						terrainTilemap.GetCellCenterWorld(coordinate);
@@ -224,36 +296,10 @@ namespace Controllers
 		private static void DrawLabel(Vector3 center, string s)
 		{
 #if UNITY_EDITOR
-			UnityEditor.Handles.Label(center, s);
+			Handles.Label(center, s);
 #endif
 		}
+		#endregion
 
-		public bool TryFindPath(int fromIndex, int toIndex, ref List<int> resultPath)
-		{
-			return Pathfinding.AStar.TryFindPath(
-				fromIndex, 
-				toIndex,
-				tilemapModel.IsEmpty,
-				pathfinderModel.GetNeighbours,
-				x => pathfinderModel.GetDistance(toIndex,x),
-				tilemapModel.Count,
-				ref resultPath,		
-				out _);
-		}
-
-		[Flags]
-		public enum DebugModes
-		{
-			None = 0,
-			Index = 1,
-			Coordinates = 2,
-			WalkableTiles = 4,
-			Adjacencies = 8,
-			Path = 16,
-			Entity = 32
-		}
-
-		public Vector3 GetWorldPosition(int positionIndex) => terrainTilemap.GetCellCenterWorld(tilemapModel.IndexToCoordinate(positionIndex));
-		public Vector3 GetWorldPosition(Vector2Int coordinate) => terrainTilemap.GetCellCenterWorld((Vector3Int)coordinate);
 	}
 }

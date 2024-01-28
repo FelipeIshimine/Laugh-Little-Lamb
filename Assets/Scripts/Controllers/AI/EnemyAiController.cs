@@ -94,7 +94,8 @@ namespace Controllers.AI
 						normalPathfinder.GetCost,
 						normalPathfinder.Length,
 						ref path,
-						out var pathCost);
+						out var pathCost,
+						HighValue);
 
 					if (path.Count > 1)
 					{

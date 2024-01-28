@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Models
@@ -7,6 +8,7 @@ namespace Models
 	[System.Serializable]
 	public class TilemapModel
 	{
+		public const int LIGHT_LENGTH = 3;
 		[SerializeField] private List<int> floorTiles;
 		[SerializeField] private List<int> illuminatedTiles;
 		[SerializeField] private EntityModel[] entities;
@@ -32,12 +34,14 @@ namespace Models
 					ActiveSheeps.Add(sheepEntityModel);
 				}
 			}
-			
+			CalculateLights();
 		}
 
 		public bool IsFloor(int index) => floorTiles.Contains(index);
 
 		public int Count => bounds.size.x * bounds.size.y;
+		public IEnumerable<int> IlluminatedTiles => illuminatedTiles;
+
 		public int CoordinateToIndex(Vector2Int coordinate) => coordinate.x - bounds.x + (coordinate.y - bounds.y) * bounds.size.x;
 		public Vector2Int IndexToCoordinate(int index) => new Vector2Int(index % bounds.size.x, index / bounds.size.x) + new Vector2Int(bounds.min.x,bounds.min.y);
 
@@ -170,6 +174,34 @@ namespace Models
 			DeadSheeps.Remove(sheep);
 			ActiveSheeps.Add(sheep);
 			AddEntity(sheep, sheepPosition);
+		}
+
+		[Button]
+		public void CalculateLights()
+		{
+			Debug.Log("CalculateLights");
+			illuminatedTiles.Clear();
+			foreach (SheepEntityModel sheepEntityModel in ActiveSheeps)
+			{
+				var coordinate = IndexToCoordinate(sheepEntityModel.PositionIndex);
+				for (int i = 0; i < LIGHT_LENGTH; i++)
+				{
+					coordinate += sheepEntityModel.LookDirection.Value.ToVector2Int();
+					int index = CoordinateToIndex(coordinate);
+					if (bounds.Contains((Vector3Int)coordinate) && IsEmpty(index))
+					{
+						if (!illuminatedTiles.Contains(index))
+						{
+							illuminatedTiles.Add(index);
+						}
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+			
 		}
 	}
 }

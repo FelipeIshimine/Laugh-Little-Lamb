@@ -94,8 +94,9 @@ namespace Pathfinding
 			Func<int,float> getDistance,
 			Func<int,float> getCost,
 			int count, 
-			ref List<int> path, 
-			out int pathCost)
+			ref List<int> path,
+			out int pathCost,
+			int maxCost = int.MaxValue)
 		{
 			var result= TryFindMultiPath(destinations, startPositions, isWalkable,getAdjacencies, getDistance, getCost, count,
 				ref path, out pathCost);
@@ -114,7 +115,8 @@ namespace Pathfinding
 			Func<int,float> getCost,
 			int count, 
 			ref List<int> path, 
-			out int pathCost)
+			out int pathCost,
+			int maxCost = int.MaxValue)
 		{
 			path.Clear();
 			//Debug.Log($"Find Path {start} => {destination}");
@@ -158,7 +160,7 @@ namespace Pathfinding
 					{
 						var distance = getDistance(neighbour);
 						var newScore = (int)(currentScore + getCost(neighbour) + distance);
-						if (newScore < bestCost[neighbour])
+						if (newScore < bestCost[neighbour] && newScore <= maxCost)
 						{
 							if (closestIndex == -1 || distance < getDistance(closestIndex))
 							{

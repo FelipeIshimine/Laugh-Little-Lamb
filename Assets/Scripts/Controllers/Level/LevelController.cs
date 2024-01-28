@@ -46,6 +46,7 @@ namespace Controllers.Level
 			
 			commandsController.Initialize();
 		
+			tilemapController.Initialize();
 			tilemapModel =	tilemapController.ProcessTileMaps();
 			
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
@@ -63,6 +64,7 @@ namespace Controllers.Level
 
 		public void Terminate()
 		{
+			tilemapController.Terminate();
 			commandsController.Terminate();
 			cameraController.Terminate();
 		}
@@ -103,3 +105,4 @@ namespace Controllers.Level
 		[System.Serializable] public class Lose : Result { }
 	}
 }
+
