@@ -44,16 +44,28 @@ namespace Controllers.AI
 			normalPathfinder = new PathfinderModel(
 				this.tilemapModel.Count, 
 				x=>this.tilemapModel.GetNeighbours(x).ToArray(),
-				this.tilemapModel.IsFloor,
+				NormalIsWalkable,
 				CalculateNormalTileCost,
 				CalculateNormalDistanceBetween);
 			
 			scaredPathfinder = new PathfinderModel(
 				this.tilemapModel.Count, 
 				x=>this.tilemapModel.GetNeighbours(x).ToArray(),
-				this.tilemapModel.IsFloor,
+				ScaredIsWalkable,
 				CalculateScaredTileCost,
 				CalculateNormalDistanceBetween);
+		}
+
+		private bool NormalIsWalkable(int index)
+		{
+			var otherEntity = tilemapModel.GetEntity(index);
+			return this.tilemapModel.IsFloor(index) && (otherEntity == null || otherEntity is SheepEntityModel || otherEntity is EnemyEntityModel);
+		}
+		
+		private bool ScaredIsWalkable(int index)
+		{
+			var otherEntity = tilemapModel.GetEntity(index);
+			return this.tilemapModel.IsFloor(index) && (otherEntity == null || otherEntity is SheepEntityModel || otherEntity is EnemyEntityModel);
 		}
 
 
