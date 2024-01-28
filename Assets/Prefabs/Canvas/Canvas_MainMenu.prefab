@@ -836,7 +836,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: W A S D - Move
+  m_text: "\u2191 \u2193 \u2192 \u2190\r\nMove"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 566f74121cb471545bfdafe44051fbec, type: 2}
   m_sharedMaterial: {fileID: 1092163551130280836, guid: 566f74121cb471545bfdafe44051fbec, type: 2}
@@ -863,15 +863,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
+  m_fontSize: 28
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 10
-  m_fontSizeMax: 36
-  m_fontStyle: 0
+  m_fontSizeMax: 28
+  m_fontStyle: 16
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -1177,7 +1177,7 @@ GameObject:
   - component: {fileID: 7358147846181225635}
   - component: {fileID: 6409094490299904523}
   m_Layer: 5
-  m_Name: Keys
+  m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
