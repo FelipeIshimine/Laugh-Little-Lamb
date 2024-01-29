@@ -3,6 +3,7 @@ using Controllers.Commands;
 using Controllers.Entities;
 using UnityEngine;
 using Views;
+using Views.Entities;
 
 namespace Controllers.CommandAnimations
 {

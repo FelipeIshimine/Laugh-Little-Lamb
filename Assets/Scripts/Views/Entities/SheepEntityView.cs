@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Views
+namespace Views.Entities
 {
 	public class SheepEntityView : EntityView
 	{

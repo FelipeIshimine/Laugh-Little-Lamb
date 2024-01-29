@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using Controllers.Commands;
+using Controllers.Level;
 using Models;
 using UnityEngine;
 using Views;
+using Views.Entities;
 
 namespace Controllers.CommandAnimations
 {

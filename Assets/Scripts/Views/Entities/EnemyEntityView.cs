@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Views
+﻿namespace Views.Entities
 {
 	public class EnemyEntityView : EntityView
 	{

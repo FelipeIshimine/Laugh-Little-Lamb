@@ -1,8 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Views
+namespace Views.Entities
 {
 	public class TreeEntityView : EntityView
 	{

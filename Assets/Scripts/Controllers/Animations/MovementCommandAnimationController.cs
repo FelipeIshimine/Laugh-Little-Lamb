@@ -4,6 +4,7 @@ using Controllers.Entities;
 using UnityEngine;
 using UnityEngine.Audio;
 using Views;
+using Views.Entities;
 
 namespace Controllers.CommandAnimations
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
 using Views;
+using Views.Entities;
 
 namespace Controllers
 {

@@ -19,6 +19,7 @@ public class InputController : MonoBehaviour, InputMap.IGameplayActions
 	public event Action OnUndoEvent;
 	public event Action OnDoEvent;
 	public event Action OnSkipLevelEvent;
+	public event Action OnRestartLevelEvent;
 	
 	private InputMap inputMap;
 
@@ -60,4 +61,5 @@ public class InputController : MonoBehaviour, InputMap.IGameplayActions
 	public void OnUndo(InputAction.CallbackContext context) { if(context.performed) OnUndoEvent?.Invoke();}
 	public void OnDo(InputAction.CallbackContext context) { if(context.performed) OnDoEvent?.Invoke();}
 	public void OnSkipLevel(InputAction.CallbackContext context)  { if(context.performed) OnSkipLevelEvent?.Invoke();}
- }
+	public void OnRestart(InputAction.CallbackContext context)  { if(context.performed) OnRestartLevelEvent?.Invoke();}
+}

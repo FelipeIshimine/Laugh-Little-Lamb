@@ -2,9 +2,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Controllers
+namespace Views.Canvases
 {
-	public class MainMenuController : MonoBehaviour
+	public class MainMenuCanvasView : MonoBehaviour
 	{
 		[SerializeField] private AudioClip playSfx; 
 		[SerializeField] private Button quitBtn; 

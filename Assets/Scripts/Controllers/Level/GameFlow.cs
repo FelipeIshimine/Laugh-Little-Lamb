@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using Views.Canvases;
 
 namespace Controllers
 {
@@ -27,15 +28,15 @@ namespace Controllers
 		{
 		MainMenu:
 			int levelIndex = 0;
-			MainMenuController.Result menuResult = await RunMenu();
+			MainMenuCanvasView.Result menuResult = await RunMenu();
 
 			Debug.Log($"MenuResult:{menuResult}");
-			if (menuResult is MainMenuController.QuitResult)
+			if (menuResult is MainMenuCanvasView.QuitResult)
 			{
 				goto Quit;
 			}
 			
-			if (menuResult is MainMenuController.PlayResult)
+			if (menuResult is MainMenuCanvasView.PlayResult)
 			{
 			Level:
 				LevelController.Result levelResult = await RunLevel(levelIndex);
@@ -74,13 +75,13 @@ namespace Controllers
 			Application.Quit();
 		}
 
-		private async UniTask<MainMenuController.Result> RunMenu()
+		private async UniTask<MainMenuCanvasView.Result> RunMenu()
 		{
 			var sceneHandler = Addressables.LoadSceneAsync(mainMenu, LoadSceneMode.Additive);
 			await sceneHandler.Task;
 			
-			MainMenuController mainMenuController = FindFirstObjectByType<MainMenuController>();
-			var result = await mainMenuController.Run();
+			MainMenuCanvasView mainMenuCanvasView = FindFirstObjectByType<MainMenuCanvasView>();
+			var result = await mainMenuCanvasView.Run();
 			await Addressables.UnloadSceneAsync(sceneHandler).Task;
 
 			return result;

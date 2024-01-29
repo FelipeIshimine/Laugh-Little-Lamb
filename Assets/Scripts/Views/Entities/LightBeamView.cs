@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Views
+namespace Views.Entities
 {
 	public class LightBeamView : MonoBehaviour
 	{

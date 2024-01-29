@@ -11,6 +11,7 @@ using Cysharp.Threading.Tasks;
 using Models;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Views.Canvases;
 
 namespace Controllers.Level
 {
@@ -28,7 +29,7 @@ namespace Controllers.Level
 		[SerializeField] private AnimationsController animationsController;
 		[SerializeField] private InputController inputController;
 		
-		[SerializeField] private GameOverController gameOverController;
+		[SerializeField] private GameOverCanvasView gameOverController;
 
 		[SerializeField] private TilemapModel tilemapModel;
 		
@@ -48,7 +49,6 @@ namespace Controllers.Level
 			}
 			
 			inputController.Initialize();
-			inputController.gameObject.SetActive(false);
 			
 			commandsController.Initialize();
 		
@@ -57,7 +57,7 @@ namespace Controllers.Level
 			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
 		
-			sheepsController.Initialize(entitiesController, commandsController, animationsController, inputController, ShowMenu, SkipLevel);
+			sheepsController.Initialize(entitiesController, commandsController, animationsController, inputController, ShowMenu, SkipLevel, RestartLevel);
 			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController, commandsController);
 			
 			cameraController.Initialize(
@@ -66,10 +66,6 @@ namespace Controllers.Level
 				entitiesController.GetDoorViews().ToArray());
 		}
 
-		private void SkipLevel() => resultCompletionSource?.TrySetResult(new WinResult());
-
-		private void ShowMenu() => resultCompletionSource?.TrySetResult(new QuitResult());
-
 		public void Terminate()
 		{
 			inputController.Terminate();
@@ -77,11 +73,15 @@ namespace Controllers.Level
 			cameraController.Terminate();
 			
 			animationsController.Terminate();
-			//entitiesController.Terminate();
 		
 			sheepsController.Terminate();
-			//enemyAiController.Terminate();
 		}
+
+		private void RestartLevel() => resultCompletionSource.TrySetResult(new RestartResult());
+
+		private void SkipLevel() => resultCompletionSource?.TrySetResult(new WinResult());
+
+		private void ShowMenu() => resultCompletionSource?.TrySetResult(new QuitResult());
 
 		public async UniTask<Result> Run(Tilemap terrainTilemap, Tilemap entitiesTilemap)
 		{
@@ -120,7 +120,7 @@ namespace Controllers.Level
 					await player.TakeTurnAsync(token);
 					while (animationsController.IsPlaying)
 					{
-						await Task.Yield();
+						await UniTask.NextFrame();
 					}
 
 					if (PlayerWon())
@@ -132,22 +132,42 @@ namespace Controllers.Level
 
 					if (PlayerLost())
 					{
-						switch (await gameOverController.Run())
-						{
-							case GameOverController.RestartResult:
-								resultCompletionSource?.TrySetResult(new RestartResult());
-								break;
-							case GameOverController.QuitResult:
-								resultCompletionSource?.TrySetResult(new QuitResult());
-								break;
-							default:
-								throw new ArgumentOutOfRangeException();
-						}
+						await GameOverLoop(token);
 						canContinue = false;
 						break;
 					}
 				}
 			}
+		}
+
+		private async UniTask GameOverLoop(CancellationToken token)
+		{
+			Debug.Log("GameOverLoop Start");
+			CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+			inputController.OnRestartLevelEvent += RestartLevel;
+			var result = await UniTask.WhenAny(
+				gameOverController.Run(cts.Token),
+				resultCompletionSource.Task);
+			inputController.OnRestartLevelEvent -= RestartLevel;
+			
+			cts.Cancel();
+			
+			if (result.winArgumentIndex == 0)
+			{
+				switch (result.result1)
+				{
+					case GameOverCanvasView.RestartResult:
+						resultCompletionSource?.TrySetResult(new RestartResult());
+						break;
+					case GameOverCanvasView.QuitResult:
+						resultCompletionSource?.TrySetResult(new QuitResult());
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
+				}
+			}
+			Debug.Log("GameOverLoop End");
 		}
 
 		private bool PlayerLost() => tilemapModel.DeadSheeps.Count > 0;

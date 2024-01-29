@@ -7,6 +7,7 @@ using Controllers.Entities;
 using Models;
 using UnityEngine;
 using Views;
+using Views.Entities;
 
 namespace Controllers
 {

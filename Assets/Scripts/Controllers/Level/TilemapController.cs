@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace Controllers
+namespace Controllers.Level
 {
 	public class TilemapController : MonoBehaviour
 	{
@@ -46,14 +46,20 @@ namespace Controllers
 	   
 			var bounds = terrainTilemap.cellBounds;
 			var count = terrainTilemap.GetTilesBlockNonAlloc(bounds, AllTiles);
-			
+
 			List<int> floor = new List<int>(count);
+			HashSet<int> isWall = new HashSet<int>(floor);
+
 			for (var index = 0; index < count; index++)
 			{
 				var tile = AllTiles[index];
 				if (floorTiles.Exists( x => x == tile))
 				{
 					floor.Add(index);
+				}
+				else if (tile == null)
+				{
+					isWall.Add(index);
 				}
 			}
 
@@ -79,6 +85,10 @@ namespace Controllers
 				else if(tile == exitTile)
 				{
 					model = new DoorEntityModel(index);
+				}
+				else if (isWall.Contains(index))
+				{
+					model = new TreeEntityModel(index);
 				}
 				else
 				{

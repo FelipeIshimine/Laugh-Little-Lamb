@@ -141,7 +141,16 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
                     ""id"": ""fe922661-701e-473d-806c-8bdc9f83c027"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """",
+                    ""interactions"": ""Press"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Restart"",
+                    ""type"": ""Button"",
+                    ""id"": ""a5fb9e9e-36b4-4b23-8e21-edc8ff017af7"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": false
                 }
             ],
@@ -288,6 +297,17 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
                     ""action"": ""SkipLevel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cd6c0c7e-6012-4910-8377-5fb531a012be"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Restart"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -309,6 +329,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         m_Gameplay_Undo = m_Gameplay.FindAction("Undo", throwIfNotFound: true);
         m_Gameplay_Do = m_Gameplay.FindAction("Do", throwIfNotFound: true);
         m_Gameplay_SkipLevel = m_Gameplay.FindAction("SkipLevel", throwIfNotFound: true);
+        m_Gameplay_Restart = m_Gameplay.FindAction("Restart", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -383,6 +404,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Undo;
     private readonly InputAction m_Gameplay_Do;
     private readonly InputAction m_Gameplay_SkipLevel;
+    private readonly InputAction m_Gameplay_Restart;
     public struct GameplayActions
     {
         private @InputMap m_Wrapper;
@@ -400,6 +422,7 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         public InputAction @Undo => m_Wrapper.m_Gameplay_Undo;
         public InputAction @Do => m_Wrapper.m_Gameplay_Do;
         public InputAction @SkipLevel => m_Wrapper.m_Gameplay_SkipLevel;
+        public InputAction @Restart => m_Wrapper.m_Gameplay_Restart;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -448,6 +471,9 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
             @SkipLevel.started += instance.OnSkipLevel;
             @SkipLevel.performed += instance.OnSkipLevel;
             @SkipLevel.canceled += instance.OnSkipLevel;
+            @Restart.started += instance.OnRestart;
+            @Restart.performed += instance.OnRestart;
+            @Restart.canceled += instance.OnRestart;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -491,6 +517,9 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
             @SkipLevel.started -= instance.OnSkipLevel;
             @SkipLevel.performed -= instance.OnSkipLevel;
             @SkipLevel.canceled -= instance.OnSkipLevel;
+            @Restart.started -= instance.OnRestart;
+            @Restart.performed -= instance.OnRestart;
+            @Restart.canceled -= instance.OnRestart;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -523,5 +552,6 @@ public partial class @InputMap: IInputActionCollection2, IDisposable
         void OnUndo(InputAction.CallbackContext context);
         void OnDo(InputAction.CallbackContext context);
         void OnSkipLevel(InputAction.CallbackContext context);
+        void OnRestart(InputAction.CallbackContext context);
     }
 }

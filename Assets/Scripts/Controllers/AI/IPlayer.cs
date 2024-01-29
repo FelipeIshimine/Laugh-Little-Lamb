@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace Controllers
+namespace Controllers.AI
 {
 	public interface IPlayer
 	{
