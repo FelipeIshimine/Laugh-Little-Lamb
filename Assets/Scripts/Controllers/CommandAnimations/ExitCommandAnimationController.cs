@@ -72,7 +72,7 @@ namespace Controllers.CommandAnimations
 				view.transform.localScale = Vector3.LerpUnclamped(startScale,Vector3.zero, animCurve.Evaluate(t));
 				yield return null;
 			} while (t<1);
-			AudioSource.PlayClipAtPoint(audioClip, Vector3.zero, .2f);
+			AudioSource.PlayClipAtPoint(audioClip, Vector3.zero, .1f);
 		}
 		
 		private IEnumerator AppearAnimation(EntityView view)

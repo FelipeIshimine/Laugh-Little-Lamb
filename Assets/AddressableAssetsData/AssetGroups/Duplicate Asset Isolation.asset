@@ -1,0 +1,105 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Duplicate Asset Isolation
+  m_EditorClassIdentifier: 
+  m_GroupName: Duplicate Asset Isolation
+  m_Data:
+    m_SerializedData: []
+  m_GUID: a289db146c2ca1546b48e943beaab03b
+  m_SerializeEntries:
+  - m_GUID: 77f198fc9e4c9ca42ab179208cc87011
+    m_Address: Assets/TilemapPalette/tile_wall.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b56af6e6bfc0dc740b0dee1668608f83
+    m_Address: Assets/Sprites/tile_tree.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 85a1d4c9365f1dd468150f0988786c68
+    m_Address: Assets/Sprites/tile_doorOpen.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc8c0ea918056b94b80f1beb499e2b16
+    m_Address: Assets/Sprites/tile_playerRight.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d0ee1382fe213c41980a7e3a97bcd4a
+    m_Address: Assets/TilemapPalette/tile_playerRight.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d71c35272baf6cc419792e4edfeecbd1
+    m_Address: Assets/TilemapPalette/tile_enemy.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8200ea603b4dd10419ae01a0342a3f42
+    m_Address: Assets/Sprites/tile_enemy.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 409fc373c571c904cacbb8f53a545652
+    m_Address: Assets/TilemapPalette/tile_doorOpen.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a97c105638bdf8b4a8650670310a4cd3
+    m_Address: Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Lit-Default.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e260cfa7296ee7642b167f1eb5be5023
+    m_Address: Packages/com.unity.render-pipelines.universal/Shaders/2D/Sprite-Lit-Default.shader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8b30f0f98732ad4fbdb660977083edc
+    m_Address: Assets/TilemapPalette/tile_floorGrass.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a06970b8ec01f354f99d2055dc6f952a
+    m_Address: Assets/Sprites/tile_floorGrass.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e041898e4bf3864cbb10a058da9a8f7
+    m_Address: Assets/TilemapPalette/tile_playerLeft.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77eeba86bf2b4f04782421c271a57965
+    m_Address: Assets/Sprites/tile_playerLeft.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5b96d9b9c5f93d04bbfd2c5ee2b2e3ce
+    m_Address: Assets/TilemapPalette/tile_playerDown.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce301d257d68c8a44a85959dc68b532b
+    m_Address: Assets/Sprites/tile_playerFront.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 0c08e384817cb1f428f4645c3e9f7d31, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 6cc18ab4962447a4fbeb84d8271a5cce, type: 2}
+    - {fileID: 11400000, guid: 70d287b3e6db1494f95b430536261c5a, type: 2}
