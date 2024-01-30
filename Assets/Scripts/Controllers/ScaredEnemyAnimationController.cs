@@ -44,13 +44,13 @@ namespace Controllers
 		private void PlayScare(EnemyEntityModel enemyEntityModel)
 		{
 			var view = (EnemyEntityView)ModelToView[enemyEntityModel];
-			AnimationsController.Play(Play(view.ScareAnimation()), view, enemyEntityModel);
+			AnimationsController.Play(Play(view.ScareAnimation()), view, enemyEntityModel, enemyEntityModel.PositionIndex);
 		}
 
 		private void PlayUnScare(EnemyEntityModel enemyEntityModel)
 		{
 			var view = (EnemyEntityView)ModelToView[enemyEntityModel];
-			AnimationsController.Play(view.UnScaredAnimation(), view, enemyEntityModel);
+			AnimationsController.Play(view.UnScaredAnimation(), view, enemyEntityModel, enemyEntityModel.PositionIndex);
 		}
 
 		private IEnumerator Play(IEnumerator animation)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Controllers.AI;
 using Controllers.CommandAnimations;
@@ -110,6 +111,9 @@ namespace Controllers.Player
 		private void OnMoveLeft() => MoveEverySheep(Orientation.Left);  
 		private void OnMoveRight() => MoveEverySheep(Orientation.Right);
 
+		private Stack<SheepTurnStart> turnStarts = new Stack<SheepTurnStart>();
+		[SerializeField] private float rewindSpeed = 3;
+
 		private void MoveEverySheep(Orientation orientation)
 		{
 			//Debug.Log($">>>>>>>>>>>>>{orientation}");
@@ -128,7 +132,6 @@ namespace Controllers.Player
 		public async UniTask TakeTurnAsync(CancellationToken token)
 		{
 			commandsController.Do(new SheepTurnStart());
-			
 			RegisterInputs();
             
 			gameObject.SetActive(true);
@@ -147,13 +150,14 @@ namespace Controllers.Player
 			{
 				return;
 			}
-			if (commandsController.HistoryStack.TryPeek(out var result) && result is SheepTurnStart)
+			Debug.Log("Undo");
+			if (commandsController.HistoryStack.Count > 1 && commandsController.HistoryStack.Peek() is SheepTurnStart)
 			{
 				commandsController.Undo();
+				commandsController.UndoUntil<SheepTurnStart>(false);
 			}
-			commandsController.Undo<SheepTurnStart>();
-
-			Time.timeScale = 3;
+			
+			Time.timeScale = rewindSpeed;
 			while (animationsController.IsPlaying)
 			{
 				await UniTask.NextFrame();
@@ -167,14 +171,11 @@ namespace Controllers.Player
 			{
 				return;
 			}
-			if (commandsController.RedoStack.TryPeek(out var result) && result is SheepTurnStart)
-			{
-				commandsController.Redo();
-			}
-			commandsController.Redo<SheepTurnStart>();
 			
-			Time.timeScale = 3;
-			while (animationsController.IsPlaying)
+			commandsController.RedoUntil<SheepTurnStart>(true);
+			
+			Time.timeScale = rewindSpeed;
+			while (animationsController.IsPlaying)	
 			{
 				await UniTask.NextFrame();
 			}

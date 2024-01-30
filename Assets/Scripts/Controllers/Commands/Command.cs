@@ -43,7 +43,7 @@ namespace Controllers.Commands
 
 		public void Undo()
 		{
-			Debug.Log($"<<< {GetType().Name}.Undo()");
+			//Debug.Log($"<<< {GetType().Name}.Undo()");
 			UndoAction();
 			OnUndo.Raise((T)this);
 		}

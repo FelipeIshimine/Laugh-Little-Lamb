@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Controllers.Commands;
 
 namespace Controllers.Entities
@@ -32,5 +33,6 @@ namespace Controllers.Entities
 				Commands[i].Undo();
 			}
 		}
+
 	}
 }

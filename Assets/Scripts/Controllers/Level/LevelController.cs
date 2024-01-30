@@ -10,6 +10,7 @@ using Controllers.Player;
 using Cysharp.Threading.Tasks;
 using Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using Views.Canvases;
 
@@ -38,7 +39,7 @@ namespace Controllers.Level
 		{
 			if(GameFlow.Instance == null)
 			{
-				await Run(null,null);
+				SceneManager.LoadScene(0);
 			}
 		}
 

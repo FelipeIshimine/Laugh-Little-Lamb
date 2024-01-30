@@ -26,6 +26,6 @@ namespace Controllers.Entities
 			TilemapModel.SwapEntities(StartPosition,EndPosition);
 		}
 
-		public override string ToString() => $"{EntityModel.GetType().Name} {StartPosition}=>{EndPosition}";
+		//public override string ToString() => $"{EntityModel.GetType().Name} {StartPosition}=>{EndPosition}";
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Controllers.Entities;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,6 +9,10 @@ namespace Controllers.Commands
 {
 	public class CommandsController : MonoBehaviour
 	{
+		public event Action OnDo;
+		public event Action OnRedo;
+		public event Action OnUndo;
+		
 		[ShowInInspector,ReadOnly, FoldoutGroup("Debug")] private readonly Stack<ICommand> historyStack = new Stack<ICommand>();
 		[ShowInInspector,ReadOnly, FoldoutGroup("Debug")] private readonly Stack<ICommand> redoStack = new Stack<ICommand>();
 		public Stack<ICommand> HistoryStack => historyStack;
@@ -33,6 +38,15 @@ namespace Controllers.Commands
 			}
 			historyStack.Push(command);
 			command.Do();
+			OnDo?.Invoke();
+		}
+
+		public void Do(IEnumerable<ICommand> commands)
+		{
+			foreach (var command in commands)
+			{
+				Do(command);
+			}
 		}
 
 		[Button]
@@ -44,6 +58,7 @@ namespace Controllers.Commands
 				command.Do();
 				//Debug.Log($"Redo:{command}");
 				historyStack.Push(command);
+				OnRedo?.Invoke();
 			}
 		}
 
@@ -56,6 +71,7 @@ namespace Controllers.Commands
 				//Debug.Log($"Undo:{command}");
 				redoStack.Push(command);
 				command.Undo();
+				OnUndo?.Invoke();
 				return command;
 			}
 			return null;
@@ -73,26 +89,42 @@ namespace Controllers.Commands
 			for (int i = 0; i < 2; i++) Redo();
 		}
 
-		public void Undo<T>() where T : ICommand
+		public void RedoUntil(Predicate<ICommand> predicate, bool inclusive)
 		{
-			do
-			{
-				Undo();
-			} while (historyStack.Count > 0 && (!redoStack.TryPeek(out var result) || result is not T));
-		}
-		public void Redo<T>() where T : ICommand
-		{
-			while(redoStack.Count > 0 && (!historyStack.TryPeek(out var result) || result is not T))
+			while (redoStack.TryPeek(out var command) && !predicate(command))
 			{
 				Redo();
-			} 
+			}
+			if (redoStack.Count > 0 && inclusive)
+			{
+				Redo();
+			}
 		}
+		
+		public void UndoUntil(Predicate<ICommand> predicate, bool inclusive)
+		{
+			Debug.Log("UndoUntil");
+			while (historyStack.TryPeek(out var command) && !predicate(command))
+			{
+				Undo();
+			}
+			if (historyStack.Count > 0 && inclusive)
+			{
+				Undo();
+			}
+		}
+		public void UndoUntil(ICommand command, bool inclusive) => UndoUntil(x => x == command, inclusive);
+		public void RedoUntil(ICommand command, bool inclusive) => RedoUntil(x => x == command, inclusive);
+
+		public void UndoUntil<T>(bool inclusive) where T : ICommand => UndoUntil(x => x is T, inclusive);
+		public void RedoUntil<T>(bool inclusive) where T : ICommand=> RedoUntil(x => x is T, inclusive);
 
 		public void ClearAll()
 		{
 			historyStack.Clear();
 			redoStack.Clear();			
 		}
+
 	}
 
 	public abstract class CommandListener : IComparable<CommandListener> 

@@ -38,7 +38,7 @@ namespace Controllers.Entities
 
 		[SerializeField] private int lightLength = 3;
 		private CommandListener<TurnLightOnCommand> onTurnLightOnListener;
-		private CommandListener<TurnLightOnCommand> onTurnLightOffListener;
+		private CommandListener<TurnLightOffCommand> onTurnLightOffListener;
 		private CommandListener<MoveCommand> onMoveCommandListener;
 
 		public void Initialize(CommandsController commands, TilemapModel model, TilemapController tilemapController)
@@ -111,7 +111,7 @@ namespace Controllers.Entities
 			TurnOnSheepLights();
 
 			onTurnLightOnListener = TurnLightOnCommand.OnDo.AddListener(OnTurnLightOnCommand, 120);
-			onTurnLightOffListener = TurnLightOnCommand.OnDo.AddListener(OnTurnLightOffCommand, 120);
+			onTurnLightOffListener = TurnLightOffCommand.OnDo.AddListener(OnTurnLightOffCommand, 120);
 			onMoveCommandListener = MoveCommand.OnDo.AddListener(OnMoveCommand, 120);
 		}
 
@@ -120,7 +120,7 @@ namespace Controllers.Entities
 		{
 			MoveCommand.OnDo.RemoveListener(onMoveCommandListener);
 			TurnLightOnCommand.OnDo.RemoveListener(onTurnLightOnListener);
-			TurnLightOnCommand.OnDo.RemoveListener(onTurnLightOffListener);
+			TurnLightOffCommand.OnDo.RemoveListener(onTurnLightOffListener);
 		}
 
 		private void OnMoveCommand(MoveCommand obj)
@@ -129,13 +129,14 @@ namespace Controllers.Entities
 			{
 				if (enemyEntityModel.IsScared && !tilemapModel.IsIlluminated(enemyEntityModel.PositionIndex, out _))
 				{
+					Debug.Log($"Reacting to {obj.GetType().Name}");
 					commandsController.Do(new UnScareEnemyCommand(enemyEntityModel));
 				}
 			}
 		}
 
 
-		private void OnTurnLightOffCommand(TurnLightOnCommand obj)
+		private void OnTurnLightOffCommand(TurnLightOffCommand obj)
 		{
 			foreach (var tilePosition in obj.LightBeam.Positions)
 			{
@@ -143,6 +144,7 @@ namespace Controllers.Entities
 				    tilemapModel.GetEntity(tilePosition) is EnemyEntityModel enemyEntityModel &&
 				    enemyEntityModel.IsScared)
 				{
+					Debug.Log($"Reacting to {obj.GetType().Name}");
 					commandsController.Do(new UnScareEnemyCommand(enemyEntityModel));
 				}
 			}
@@ -155,6 +157,7 @@ namespace Controllers.Entities
 				if (tilemapModel.GetEntity(tilePosition) is EnemyEntityModel enemyEntityModel &&
 				    !enemyEntityModel.IsScared)
 				{
+					Debug.Log($"Reacting to {obj.GetType().Name}");
 					commandsController.Do(new ScareEnemyCommand(enemyEntityModel));
 				}
 			}
@@ -167,7 +170,7 @@ namespace Controllers.Entities
 			{
 				turnOnLightsCommands.Add(new TurnLightOnCommand(sheepEntityModel, tilemapModel, lightLength));
 			}
-			commandsController.Do(new CompositeCommand(turnOnLightsCommands));
+			commandsController.Do(turnOnLightsCommands);
 			commandsController.ClearAll();
 		}
 
@@ -320,7 +323,7 @@ namespace Controllers.Entities
 			{
 				commands.Add(new WaitCommand(entity));
 			}
-			commandsController.Do(new CompositeCommand(commands));
+			commandsController.Do(commands);
 		}
 
 		
