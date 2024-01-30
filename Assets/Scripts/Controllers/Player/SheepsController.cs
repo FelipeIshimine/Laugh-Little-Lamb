@@ -112,7 +112,7 @@ namespace Controllers.Player
 
 		private void MoveEverySheep(Orientation orientation)
 		{
-			Debug.Log($">>>>>>>>>>>>>{orientation}");
+			//Debug.Log($">>>>>>>>>>>>>{orientation}");
 			UnregisterInputs();
 			entitiesController.MoveTogether(entitiesController.SheepEntityModels, orientation);
 			turnCompleteSource.TrySetResult();

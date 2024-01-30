@@ -14,7 +14,7 @@ namespace Views.Canvases
 		
 		public async UniTask<Result> Run()
 		{
-			Debug.Log($"{this}.Run()");
+			//Debug.Log($"{this}.Run()");
 			playBtn.onClick.AddListener(Play);
 			quitBtn.onClick.AddListener(Quit);
 			resultCompletionSource = new UniTaskCompletionSource<Result>();

@@ -68,7 +68,7 @@ namespace Model
 
         private void OnEnable()
         {
-	        Debug.Log("Database Loaded");
+	        //Debug.Log("Database Loaded");
 	        instance = this;
         }
   

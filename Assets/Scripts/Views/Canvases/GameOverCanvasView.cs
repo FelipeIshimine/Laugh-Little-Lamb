@@ -31,8 +31,7 @@ namespace Views.Canvases
 			
 			(bool hasResult, var result) = await UniTask.WhenAny(
 				resultCompletionSource.Task,
-				UniTask.FromCanceled(cancellationToken));
-
+				UniTask.WaitUntilCanceled(cancellationToken));
 			if (hasResult)
 			{
 				canvasGroup.interactable = false;

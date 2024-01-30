@@ -30,7 +30,7 @@ namespace Controllers
 			int levelIndex = 0;
 			MainMenuCanvasView.Result menuResult = await RunMenu();
 
-			Debug.Log($"MenuResult:{menuResult}");
+			//Debug.Log($"MenuResult:{menuResult}");
 			if (menuResult is MainMenuCanvasView.QuitResult)
 			{
 				goto Quit;

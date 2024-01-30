@@ -147,7 +147,7 @@ namespace Controllers.Level
 
 		private async UniTask GameOverLoop(CancellationToken token)
 		{
-			Debug.Log("GameOverLoop Start");
+			//Debug.Log("GameOverLoop Start");
 			CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
 			inputController.OnRestartLevelEvent += RestartLevel;
@@ -172,7 +172,7 @@ namespace Controllers.Level
 						throw new ArgumentOutOfRangeException();
 				}
 			}
-			Debug.Log("GameOverLoop End");
+			//Debug.Log("GameOverLoop End");
 		}
 
 		private bool PlayerLost() => tilemapModel.DeadSheeps.Count > 0;
