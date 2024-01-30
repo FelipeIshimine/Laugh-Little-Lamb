@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Views.Entities
 {
@@ -10,5 +11,6 @@ namespace Views.Entities
 		{
 			spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		}
+
 	}
 }

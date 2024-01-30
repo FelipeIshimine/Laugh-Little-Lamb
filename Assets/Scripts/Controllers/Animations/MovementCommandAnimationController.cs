@@ -1,12 +1,11 @@
 ﻿using System.Collections;
+using Controllers.CommandAnimations;
 using Controllers.Commands;
 using Controllers.Entities;
 using UnityEngine;
-using UnityEngine.Audio;
-using Views;
 using Views.Entities;
 
-namespace Controllers.CommandAnimations
+namespace Controllers.Animations
 {
 	public class MovementCommandAnimationController : CommandAnimationController
 	{
@@ -37,12 +36,20 @@ namespace Controllers.CommandAnimations
 			var otherEntityModel = command.TilemapModel.GetEntity(position);
 			if (otherEntityModel != null)
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),false), command.EntityModel, position,
+				AnimationsController.Play(
+					MoveAnimation(view, TilemapController.GetWorldPosition(position),false),
+					view,
+					command.EntityModel,
+					position,
 					otherEntityModel);
 			}
 			else
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),false), command.EntityModel, position);
+				AnimationsController.Play(
+					MoveAnimation(view, TilemapController.GetWorldPosition(position),false), 
+					view,
+					command.EntityModel,
+					position);
 			}
 		}
 
@@ -54,12 +61,20 @@ namespace Controllers.CommandAnimations
 			var otherEntityModel = command.TilemapModel.GetEntity(position);
 			if (otherEntityModel != null)
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),true), command.EntityModel, position,
+				AnimationsController.Play(
+					MoveAnimation(view, TilemapController.GetWorldPosition(position),true),
+					view,
+					command.EntityModel, 
+					position,
 					otherEntityModel);
 			}
 			else
 			{
-				AnimationsController.Play(MoveAnimation(view, TilemapController.GetWorldPosition(position),true), command.EntityModel, position);
+				AnimationsController.Play(
+					MoveAnimation(view, TilemapController.GetWorldPosition(position),true),
+					view,
+					command.EntityModel
+					, position);
 			}
 		}
 

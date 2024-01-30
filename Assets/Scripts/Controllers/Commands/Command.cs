@@ -14,7 +14,7 @@ namespace Controllers.Commands
 		public static readonly CommandBroadcaster<T> OnUndo = new CommandBroadcaster<T>();
 		public void Do()
 		{
-			//Debug.Log($"{InArrows()} {GetType().Name}.Do Start");
+			//Debug.Log($"{InArrows()} {GetType().Name}.Do");
 			DoAction();
 			OnDo.Raise((T)this);
 			//Debug.Log($"{OutArrows()} {GetType().Name}.Do End");

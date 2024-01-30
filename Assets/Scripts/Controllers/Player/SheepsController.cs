@@ -32,41 +32,36 @@ namespace Controllers.Player
 		{
 			this.restartLevelCallback = restartLevelCallback;
 			this.skipLevelCallback = skipLevelCallback;
-			this.backToMenuCallback = showMenuCallback;
+			backToMenuCallback = showMenuCallback;
 			this.inputController = inputController;
 			this.animationsController = animationsController;
 			this.commandsController = commandsController;
 			this.entitiesController = entitiesController;
-
-			RegisterInputs();
 		}
 
-		public void Terminate()
-		{
-			UnregisterInputs();
-		}
+		public void Terminate() { }
 
 		private void RegisterInputs()
 		{
-			this.inputController.OnMoveUpEvent += OnMoveUp;
-			this.inputController.OnMoveDownEvent += OnMoveDown;
-			this.inputController.OnMoveLeftEvent += OnMoveLeft;
-			this.inputController.OnMoveRightEvent += OnMoveRight;
+			inputController.OnMoveUpEvent += OnMoveUp;
+			inputController.OnMoveDownEvent += OnMoveDown;
+			inputController.OnMoveLeftEvent += OnMoveLeft;
+			inputController.OnMoveRightEvent += OnMoveRight;
 			
-			this.inputController.OnLookUpEvent += OnLookUp;
-			this.inputController.OnLookDownEvent += OnLookDown;
-			this.inputController.OnLookLeftEvent += OnLookLeft;
-			this.inputController.OnLookRightEvent += OnLookRight;
+			inputController.OnLookUpEvent += OnLookUp;
+			inputController.OnLookDownEvent += OnLookDown;
+			inputController.OnLookLeftEvent += OnLookLeft;
+			inputController.OnLookRightEvent += OnLookRight;
 			
-			this.inputController.OnUndoEvent += UndoTurn;
-			this.inputController.OnDoEvent += RedoTurn;
+			inputController.OnUndoEvent += UndoTurn;
+			inputController.OnDoEvent += RedoTurn;
 			
-			this.inputController.OnWaitEvent += MakeEverySheepWait;
-			this.inputController.OnMenuEvent += BackToMenu;
+			inputController.OnWaitEvent += MakeEverySheepWait;
+			inputController.OnMenuEvent += BackToMenu;
 			
-			this.inputController.OnSkipLevelEvent += SkipLevel;
+			inputController.OnSkipLevelEvent += SkipLevel;
 			
-			this.inputController.OnRestartLevelEvent += RestartLevel;
+			inputController.OnRestartLevelEvent += RestartLevel;
 		}
 
 		private void UnregisterInputs()
@@ -81,15 +76,15 @@ namespace Controllers.Player
 			inputController.OnLookLeftEvent -= OnLookLeft;
 			inputController.OnLookRightEvent -= OnLookRight;
 			
-			this.inputController.OnUndoEvent -= UndoTurn;
-			this.inputController.OnDoEvent -= RedoTurn;
+			inputController.OnUndoEvent -= UndoTurn;
+			inputController.OnDoEvent -= RedoTurn;
 			
-			this.inputController.OnWaitEvent -= MakeEverySheepWait;
-			this.inputController.OnMenuEvent -= BackToMenu;;
+			inputController.OnWaitEvent -= MakeEverySheepWait;
+			inputController.OnMenuEvent -= BackToMenu;;
 			
-			this.inputController.OnSkipLevelEvent -= SkipLevel;
+			inputController.OnSkipLevelEvent -= SkipLevel;
 
-			this.inputController.OnRestartLevelEvent -= RestartLevel;
+			inputController.OnRestartLevelEvent -= RestartLevel;
 		}
 
 		private void RestartLevel() => restartLevelCallback?.Invoke();
@@ -105,11 +100,9 @@ namespace Controllers.Player
 
 		private void OnLook(Orientation orientation)
 		{
-			if(turnCompleteSource.TrySetResult())
-			{
-				entitiesController.LookTogether(entitiesController.SheepEntityModels, orientation);
-				UnregisterInputs();
-			}		
+			UnregisterInputs();
+			entitiesController.LookTogether(entitiesController.SheepEntityModels, orientation);
+			turnCompleteSource.TrySetResult();
 		}
 
 		private void OnMoveUp() => MoveEverySheep(Orientation.Up);  
@@ -119,22 +112,19 @@ namespace Controllers.Player
 
 		private void MoveEverySheep(Orientation orientation)
 		{
-			if (turnCompleteSource.TrySetResult())
-			{
-				entitiesController.MoveTogether(entitiesController.SheepEntityModels, orientation);
-				UnregisterInputs();
-			}
+			Debug.Log($">>>>>>>>>>>>>{orientation}");
+			UnregisterInputs();
+			entitiesController.MoveTogether(entitiesController.SheepEntityModels, orientation);
+			turnCompleteSource.TrySetResult();
 		}
 
 		private void MakeEverySheepWait()
 		{
-			if (turnCompleteSource.TrySetResult())
-			{
-				entitiesController.Wait(entitiesController.SheepEntityModels);
-				UnregisterInputs();
-			}
+			UnregisterInputs();
+			entitiesController.Wait(entitiesController.SheepEntityModels);
+			turnCompleteSource.TrySetResult();
 		}
-		
+
 		public async UniTask TakeTurnAsync(CancellationToken token)
 		{
 			commandsController.Do(new SheepTurnStart());

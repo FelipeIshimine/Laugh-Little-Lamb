@@ -32,6 +32,7 @@ namespace Controllers.Level
 		[SerializeField] private GameOverCanvasView gameOverController;
 
 		[SerializeField] private TilemapModel tilemapModel;
+
 		
 		private async UniTaskVoid Start()
 		{
@@ -47,7 +48,7 @@ namespace Controllers.Level
 			{
 				tilemapController.SetTileMaps(terrainTilemap,entitiesTilemap);
 			}
-			
+
 			inputController.Initialize();
 			
 			commandsController.Initialize();
@@ -60,6 +61,7 @@ namespace Controllers.Level
 			sheepsController.Initialize(entitiesController, commandsController, animationsController, inputController, ShowMenu, SkipLevel, RestartLevel);
 			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController, commandsController);
 			
+			
 			cameraController.Initialize(
 				entitiesController.GetSheepViews().ToArray(),
 				entitiesController.GetEnemyViews().ToArray(),
@@ -68,6 +70,7 @@ namespace Controllers.Level
 
 		public void Terminate()
 		{
+			entitiesController.Terminate();
 			inputController.Terminate();
 			commandsController.Terminate();
 			cameraController.Terminate();
@@ -117,11 +120,13 @@ namespace Controllers.Level
 
 				foreach (IPlayer player in players)
 				{
+					//Debug.Log($"{player.GetType()} Turn Started");
 					await player.TakeTurnAsync(token);
 					while (animationsController.IsPlaying)
 					{
 						await UniTask.NextFrame();
 					}
+					//Debug.Log($"{player.GetType()} Turn Ended");
 
 					if (PlayerWon())
 					{

@@ -1,11 +1,11 @@
 ﻿using System.Collections;
+using Controllers.CommandAnimations;
 using Controllers.Commands;
 using Controllers.Entities;
 using UnityEngine;
-using Views;
 using Views.Entities;
 
-namespace Controllers.CommandAnimations
+namespace Controllers.Animations
 {
 	public class EatCommandAnimationController : CommandAnimationController
 	{
@@ -27,6 +27,7 @@ namespace Controllers.CommandAnimations
 			EatCommand.OnDo.RemoveListener(doListener);
 			EatCommand.OnUndo.RemoveListener(undoListener);
 		}
+
 
 		protected void OnDoCommand(EatCommand command)
 		{
@@ -54,7 +55,7 @@ namespace Controllers.CommandAnimations
 				enemyView.transform.localScale = Vector3.one + Vector3.LerpUnclamped(Vector3.zero,Vector3.one, animCurve.Evaluate(t));
 				yield return null;
 			} while (t<1);
-			AudioSource.PlayClipAtPoint(deadSheepSfx, Vector3.zero);
+			AudioSource.PlayClipAtPoint(deadSheepSfx, Vector3.zero, .1f);
 		}
 		
 		private IEnumerator UnEatAnimation(EntityView enemyView, EntityView sheepView)

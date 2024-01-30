@@ -37,7 +37,10 @@ namespace Controllers.Entities
 		private TilemapController tilemapController;
 
 		[SerializeField] private int lightLength = 3;
-		
+		private CommandListener<TurnLightOnCommand> onTurnLightOnListener;
+		private CommandListener<TurnLightOnCommand> onTurnLightOffListener;
+		private CommandListener<MoveCommand> onMoveCommandListener;
+
 		public void Initialize(CommandsController commands, TilemapModel model, TilemapController tilemapController)
 		{
 			this.tilemapController = tilemapController;
@@ -105,6 +108,60 @@ namespace Controllers.Entities
 				}
 			}
 
+			TurnOnSheepLights();
+
+			onTurnLightOnListener = TurnLightOnCommand.OnDo.AddListener(OnTurnLightOnCommand, 120);
+			onTurnLightOffListener = TurnLightOnCommand.OnDo.AddListener(OnTurnLightOffCommand, 120);
+			onMoveCommandListener = MoveCommand.OnDo.AddListener(OnMoveCommand, 120);
+		}
+
+
+		public void Terminate()
+		{
+			MoveCommand.OnDo.RemoveListener(onMoveCommandListener);
+			TurnLightOnCommand.OnDo.RemoveListener(onTurnLightOnListener);
+			TurnLightOnCommand.OnDo.RemoveListener(onTurnLightOffListener);
+		}
+
+		private void OnMoveCommand(MoveCommand obj)
+		{
+			if (obj.EntityModel is EnemyEntityModel enemyEntityModel)
+			{
+				if (enemyEntityModel.IsScared && !tilemapModel.IsIlluminated(enemyEntityModel.PositionIndex, out _))
+				{
+					commandsController.Do(new UnScareEnemyCommand(enemyEntityModel));
+				}
+			}
+		}
+
+
+		private void OnTurnLightOffCommand(TurnLightOnCommand obj)
+		{
+			foreach (var tilePosition in obj.LightBeam.Positions)
+			{
+				if (!tilemapModel.IsIlluminated(tilePosition, out _) && 
+				    tilemapModel.GetEntity(tilePosition) is EnemyEntityModel enemyEntityModel &&
+				    enemyEntityModel.IsScared)
+				{
+					commandsController.Do(new UnScareEnemyCommand(enemyEntityModel));
+				}
+			}
+		}
+
+		private void OnTurnLightOnCommand(TurnLightOnCommand obj)
+		{
+			foreach (var tilePosition in obj.LightBeam.Positions)
+			{
+				if (tilemapModel.GetEntity(tilePosition) is EnemyEntityModel enemyEntityModel &&
+				    !enemyEntityModel.IsScared)
+				{
+					commandsController.Do(new ScareEnemyCommand(enemyEntityModel));
+				}
+			}
+		}
+
+		private void TurnOnSheepLights()
+		{
 			List<TurnLightOnCommand> turnOnLightsCommands = new List<TurnLightOnCommand>();
 			foreach (SheepEntityModel sheepEntityModel in sheepModels)
 			{

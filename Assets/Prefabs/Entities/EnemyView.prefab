@@ -99,3 +99,75 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 2737693388169308687}
+  scaredSprite: {fileID: 21300000, guid: 3ea9acbc1be4c5c4eb2de335f590fce5, type: 3}
+  scaredColor: {r: 1, g: 0.59542704, b: 0, a: 1}
+  scareDuration: 0.5
+  scareScaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -0.49358493
+      outSlope: -0.49358493
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.30389902
+      value: 0.85
+      inSlope: -0.1390495
+      outSlope: -0.1390495
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1598023
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  normalSprite: {fileID: 21300000, guid: 8200ea603b4dd10419ae01a0342a3f42, type: 3}
+  normalColor: {r: 1, g: 0.019607844, b: 0, a: 1}
+  unScareDuration: 0.5
+  unScareScaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0.8226417
+      outSlope: 0.8226417
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.30389902
+      value: 1.25
+      inSlope: 0.23174918
+      outSlope: 0.23174918
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1598023
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

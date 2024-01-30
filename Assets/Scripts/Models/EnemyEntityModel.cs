@@ -6,8 +6,17 @@ namespace Models
 	public class EnemyEntityModel : EntityModel, IMove
 	{
 		public readonly Observable<bool> IsLookingRight = new(true);
-		public EnemyEntityModel(int index) : base(index)
+		private bool isScared = false;
+
+		public bool IsScared
 		{
+			get => isScared;
+			set
+			{
+				isScared = value;
+			}
 		}
+
+		public EnemyEntityModel(int index) : base(index) { }
 	}
 }

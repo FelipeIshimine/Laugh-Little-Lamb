@@ -108,7 +108,7 @@ namespace Controllers.AI
 			{
 				for (int move = 0; move < moveSpeed; move++)
 				{
-					if (IsEnemyScared(i))
+					if (enemies[i].IsScared)
 					{
 						ProcessScaredEnemy(i);
 					}
@@ -125,11 +125,6 @@ namespace Controllers.AI
 			return UniTask.CompletedTask;
 		}
 
-		private bool IsEnemyScared(int i)
-		{
-			var enemyPosition = enemies[i];
-			return tilemapModel.IsIlluminated(enemyPosition.PositionIndex, out _);
-		}
 
 		private void ProcessNormalEnemy(int i)
 		{
