@@ -142,6 +142,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 83cda2042afe21f4686f2a220dc51385
+    m_Address: Assets/Prefabs/Levels/Level08.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 0c08e384817cb1f428f4645c3e9f7d31, type: 2}
   m_SchemaSet:

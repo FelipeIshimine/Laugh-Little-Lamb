@@ -129,7 +129,7 @@ namespace Controllers.Entities
 			{
 				if (enemyEntityModel.IsScared && !tilemapModel.IsIlluminated(enemyEntityModel.PositionIndex, out _))
 				{
-					Debug.Log($"Reacting to {obj.GetType().Name}");
+					//Debug.Log($"Reacting to {obj.GetType().Name}");
 					commandsController.Do(new UnScareEnemyCommand(enemyEntityModel));
 				}
 			}
@@ -144,7 +144,7 @@ namespace Controllers.Entities
 				    tilemapModel.GetEntity(tilePosition) is EnemyEntityModel enemyEntityModel &&
 				    enemyEntityModel.IsScared)
 				{
-					Debug.Log($"Reacting to {obj.GetType().Name}");
+					//Debug.Log($"Reacting to {obj.GetType().Name}");
 					commandsController.Do(new UnScareEnemyCommand(enemyEntityModel));
 				}
 			}
@@ -157,7 +157,7 @@ namespace Controllers.Entities
 				if (tilemapModel.GetEntity(tilePosition) is EnemyEntityModel enemyEntityModel &&
 				    !enemyEntityModel.IsScared)
 				{
-					Debug.Log($"Reacting to {obj.GetType().Name}");
+					//Debug.Log($"Reacting to {obj.GetType().Name}");
 					commandsController.Do(new ScareEnemyCommand(enemyEntityModel));
 				}
 			}
@@ -259,19 +259,26 @@ namespace Controllers.Entities
 		
 		public void LookTogether(IReadOnlyList<SheepEntityModel> sheep, Orientation orientation)
 		{
+			var commands = CreateLookTogetherCommands(sheep, orientation);
+			commandsController.Do(new CompositeCommand(commands));
+		}
+
+		public List<CompositeCommand> CreateLookTogetherCommands(IEnumerable<SheepEntityModel> sheep, Orientation orientation)
+		{
 			List<CompositeCommand> commands = new List<CompositeCommand>();
 			foreach (var entityModel in sheep)
 			{
 				commands.Add(
 					new CompositeCommand(
 						new TurnLightOffCommand(entityModel, tilemapModel),
-					new LookCommand(entityModel, orientation),
+						new LookCommand(entityModel, orientation),
 						new TurnLightOnCommand(entityModel, tilemapModel, lightLength)
 					));
 			}
-			commandsController.Do(new CompositeCommand(commands));
+
+			return commands;
 		}
-		
+
 		public void MoveTogether<T>(IEnumerable<T> entityModels, Orientation direction) where T : EntityModel, IMove
 		{
 			MoveTogether<T>(Array.ConvertAll(entityModels.ToArray(),x=>(x,direction)));
@@ -279,12 +286,16 @@ namespace Controllers.Entities
 		
 		public void MoveTogether<T>(IEnumerable<(T Entity, Orientation Direction)> values) where T : EntityModel, IMove
 		{
-			CompositeCommand command = new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateCommand(x.Entity, x.Direction)));
+			CompositeCommand command = CreateMoveTogetherCommand(values);
 			commandsController.Do(command);
 		}
-		
-		
-		
+
+		public CompositeCommand CreateMoveTogetherCommand<T>(IEnumerable<(T Entity, Orientation Direction)> values) where T : EntityModel, IMove
+		{
+			return new CompositeCommand(Array.ConvertAll(values.ToArray(), x => CreateCommand(x.Entity, x.Direction)));
+		}
+
+
 		public void Move(EntityModel model, Orientation moveDirection) => commandsController.Do(CreateCommand(model, moveDirection));
 
 		public EntityView GetView(EntityModel model) => modelToView[model];

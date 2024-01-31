@@ -184,6 +184,7 @@ namespace Models
 
 		public void RemoveLightBeam(LightBeamModel beamModel) => lightBeamModels.Remove(beamModel);
 
+		public bool IsIlluminated(int index) => IsIlluminated(index, out _);
 		public bool IsIlluminated(int index, out float intensity)
 		{
 			foreach (LightBeamModel lightBeamModel in lightBeamModels)
@@ -203,7 +204,7 @@ namespace Models
 
 		public void KillSheep(SheepEntityModel sheep)
 		{
-			Debug.Log($"KillSheep:{sheep}");
+			//Debug.Log($"KillSheep:{sheep}");
 			RemoveEntity(sheep);
 			ActiveSheeps.Remove(sheep);
 			DeadSheeps.Add(sheep);
@@ -211,7 +212,7 @@ namespace Models
 
 		public void ReviveSheep(SheepEntityModel sheep, int sheepPosition)
 		{
-			Debug.Log($"SheepRevived:{sheep} at {sheepPosition} {IndexToCoordinate(sheepPosition)}");
+			//Debug.Log($"SheepRevived:{sheep} at {sheepPosition} {IndexToCoordinate(sheepPosition)}");
 			DeadSheeps.Remove(sheep);
 			ActiveSheeps.Add(sheep);
 			AddEntity(sheep, sheepPosition);

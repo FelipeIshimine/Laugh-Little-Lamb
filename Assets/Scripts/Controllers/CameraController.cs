@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Cinemachine;
+﻿using Cinemachine;
 using UnityEngine;
-using Views;
 using Views.Entities;
 
 namespace Controllers

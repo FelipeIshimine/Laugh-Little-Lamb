@@ -7,7 +7,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
   m_Name: AddressableAssetSettings
@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 29afa70c6b7a7464ab5a8bba6d44f510
   m_currentHash:
     serializedVersion: 2
-    Hash: 7f5d0587523a6f2b02cd5bc126c15de7
+    Hash: 5c9f1ac1d8b312667f5bf2bf42f65e4f
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0

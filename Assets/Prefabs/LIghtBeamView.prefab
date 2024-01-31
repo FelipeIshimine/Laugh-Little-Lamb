@@ -46,5 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 5676924649460829445, guid: 267e7367764c9b74ab98743a70e73609, type: 3}
   lightColor: {r: 1, g: 0.8581576, b: 0.33018857, a: 1}
-  turnOnAnimDuration: 0.2
-  turnOffAnimDuration: 0.15
+  turnOnAnimDuration: 0.25
+  turnOffAnimDuration: 0.2

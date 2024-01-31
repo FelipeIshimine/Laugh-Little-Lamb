@@ -385,35 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winController: {fileID: 1757542301}
-  tilemapPrefabs:
-  - m_AssetGUID: 547424efd52129740beba6166cdfb169
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  - m_AssetGUID: 60398f0c4b8e3ad40b9cff662eaa48c8
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  - m_AssetGUID: f5b887ad0387eae4a9b3a1f1f0b8289f
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  - m_AssetGUID: 961fcdea00657f8498c515edc4dafaed
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  - m_AssetGUID: 4d7c70a20ce16b44792e09fb1d7c95af
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  - m_AssetGUID: 207fa98b92e6fab46ac3179a5a7b00d1
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  - m_AssetGUID: 9ad983babe9eee946aa7bb52c783f63d
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
+  levels: {fileID: 11400000, guid: 0fe73370dd1ad4541a4b11447db59c4d, type: 2}
   levelScene:
     m_AssetGUID: 51137e3347aa2e644ba0179e283d07eb
     m_SubObjectName: 
@@ -424,6 +396,7 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  mode: 0
 --- !u!82 &1727739011
 AudioSource:
   m_ObjectHideFlags: 0

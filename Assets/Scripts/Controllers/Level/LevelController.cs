@@ -23,6 +23,8 @@ namespace Controllers.Level
 		[SerializeField] private CommandsController commandsController;
 		
 		[SerializeField] private SheepsController sheepsController;
+		[SerializeField] private AutomaticSheepController autoSheepController;
+		
 		[SerializeField] private EnemyAiController enemyAiController;
 		
 		[SerializeField] private EntitiesController entitiesController;
@@ -31,10 +33,21 @@ namespace Controllers.Level
 		[SerializeField] private InputController inputController;
 		
 		[SerializeField] private GameOverCanvasView gameOverController;
+		[SerializeField] private TimeController timeController;
 
 		[SerializeField] private TilemapModel tilemapModel;
 
+		[SerializeField] private int maxSolutionLength = 10;
+
+		private int turnCount;
+
+		[SerializeField] private int AiModeRefreshRate = 100;
 		
+		public enum Mode
+		{
+			Human,
+			Ai
+		}
 		private async UniTaskVoid Start()
 		{
 			if(GameFlow.Instance == null)
@@ -59,6 +72,7 @@ namespace Controllers.Level
 			animationsController.Initialize(commandsController, entitiesController.ModelToView, tilemapController);
 			entitiesController.Initialize(commandsController, tilemapModel, tilemapController);
 		
+			autoSheepController.Initialize(commandsController, entitiesController, maxSolutionLength);
 			sheepsController.Initialize(entitiesController, commandsController, animationsController, inputController, ShowMenu, SkipLevel, RestartLevel);
 			enemyAiController.Initialize(entitiesController,tilemapModel, entitiesController.EnemyEntityModels, entitiesController.SheepEntityModels,tilemapController, commandsController);
 			
@@ -87,13 +101,14 @@ namespace Controllers.Level
 
 		private void ShowMenu() => resultCompletionSource?.TrySetResult(new QuitResult());
 
-		public async UniTask<Result> Run(Tilemap terrainTilemap, Tilemap entitiesTilemap)
+		public async UniTask<Result> Run(Tilemap terrainTilemap, Tilemap entitiesTilemap, Mode mode)
 		{
+			timeController.Normal();
 			Debug.Log("Level Run");
 			Initialize(terrainTilemap, entitiesTilemap);
 			resultCompletionSource = new UniTaskCompletionSource<Result>();
 			
-			GameLoop(destroyCancellationToken).Forget();
+			GameLoop(destroyCancellationToken, mode).Forget();
 
 			var result = await resultCompletionSource.Task;
 
@@ -103,17 +118,24 @@ namespace Controllers.Level
 		}
 
 
-		private async UniTaskVoid GameLoop(CancellationToken token)
+		private async UniTaskVoid GameLoop(CancellationToken token, Mode mode)
 		{
-			var players = new IPlayer[]
+			var players = new IPlayer[2];
+	
+			if(mode == Mode.Human)
 			{
-				sheepsController,
-				enemyAiController
-			};
+				players[0] = sheepsController;
+			}
+			else
+			{
+				players[0] = autoSheepController;
+			}
 
+			players[1] = enemyAiController; 
 			bool canContinue = true;
 			while (canContinue)
 			{
+				turnCount++;
 				if (gameObject == null)
 				{
 					break;
@@ -123,24 +145,60 @@ namespace Controllers.Level
 				{
 					//Debug.Log($"{player.GetType()} Turn Started");
 					await player.TakeTurnAsync(token);
+					if (mode == Mode.Human)
+					{
+						await UniTask.NextFrame();
+					}
+					else if(turnCount % AiModeRefreshRate == 0)
+					{
+						await UniTask.NextFrame();
+					}
+					
 					while (animationsController.IsPlaying)
 					{
 						await UniTask.NextFrame();
 					}
-					//Debug.Log($"{player.GetType()} Turn Ended");
 
-					if (PlayerWon())
+					if (mode == Mode.Human)
 					{
-						resultCompletionSource?.TrySetResult(new WinResult());
-						canContinue = false;
-						break;
+						if (PlayerWon())
+						{
+							resultCompletionSource?.TrySetResult(new WinResult());
+							canContinue = false;
+							break;
+						}
+						if (PlayerLost())
+						{
+							await GameOverLoop(token);
+							canContinue = false;
+							break;
+						}
 					}
-
-					if (PlayerLost())
+					else if (mode == Mode.Ai)
 					{
-						await GameOverLoop(token);
-						canContinue = false;
-						break;
+						if (PlayerWon())
+						{
+							Debug.Log("Solution Found");
+							Debug.Log(autoSheepController.PrintSolution());
+						}
+						if (PlayerLost())
+						{
+							if (autoSheepController.IsOutOfOptions)
+							{
+								while (true)
+								{
+									Debug.Log("No solution found");
+									await UniTask.NextFrame(destroyCancellationToken);
+								}
+								canContinue = false;
+								break;
+							}
+							else
+							{
+								autoSheepController.Failed();
+								//Debug.Log("Fail state. Backtrack");
+							}
+						}
 					}
 				}
 			}

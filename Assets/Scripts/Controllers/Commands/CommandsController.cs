@@ -103,7 +103,7 @@ namespace Controllers.Commands
 		
 		public void UndoUntil(Predicate<ICommand> predicate, bool inclusive)
 		{
-			Debug.Log("UndoUntil");
+			//Debug.Log("UndoUntil");
 			while (historyStack.TryPeek(out var command) && !predicate(command))
 			{
 				Undo();

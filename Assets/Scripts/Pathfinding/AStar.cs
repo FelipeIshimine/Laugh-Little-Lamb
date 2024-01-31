@@ -119,7 +119,6 @@ namespace Pathfinding
 			int maxCost = int.MaxValue)
 		{
 			path.Clear();
-			//Debug.Log($"Find Path {start} => {destination}");
 			int[] previous = new int[count];
 			int[] bestCost = new int[count];
 			
@@ -135,13 +134,17 @@ namespace Pathfinding
 			{
 				bestCost[startPosition] = 0;
 				next.Enqueue(0, startPosition);
+				Debug.Log($"Find Path {startPosition} => {destination}");
 			}
             
 
 			int closestIndex = -1;
-			
+			float closestDistance = float.MaxValue;
+
+
 			while (next.Count > 0)
 			{
+			
 				var (currentScore, index) = next.Dequeue();
 
 				if (index == destination)
@@ -159,14 +162,16 @@ namespace Pathfinding
 					if(isWalkable(neighbour))
 					{
 						var distance = getDistance(neighbour);
-						var newScore = (int)(currentScore + getCost(neighbour) + distance);
+						var newScore = (int)Mathf.Clamp((currentScore + getCost(neighbour) + distance),0,int.MaxValue);
 						if (newScore < bestCost[neighbour] && newScore <= maxCost)
 						{
-							if (closestIndex == -1 || distance < getDistance(closestIndex))
+							if (distance < closestDistance)
 							{
 								closestIndex = neighbour;
+								closestDistance = distance;
 							}
 
+							Debug.Log($"{index}=> {neighbour}   {bestCost[neighbour]}:{newScore}");
 							bestCost[neighbour] = newScore;
 							previous[neighbour] = index;
 							next.Enqueue(newScore, neighbour);
@@ -179,12 +184,16 @@ namespace Pathfinding
 
 			if (closestIndex != -1)
 			{
-				//Debug.Log($"Backtrack Start {closestIndex}");
 				pathCost = bestCost[closestIndex];
-
+				HashSet<int> visited = new HashSet<int>();
+				
 				while (closestIndex != -1)
 				{
-					//Debug.Log($"BTrack {closestIndex}");
+					if (!visited.Add(closestIndex))
+					{
+						Debug.Break();
+						break;
+					}
 					path.Add(closestIndex);
 					closestIndex = previous[closestIndex];
 				}

@@ -1,23 +1,24 @@
 using System;
-using System.Threading.Tasks;
-using Controllers.Level;
 using Cysharp.Threading.Tasks;
+using Models;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using Views.Canvases;
 
-namespace Controllers
+namespace Controllers.Level
 {
 	public class GameFlow : MonoBehaviour
 	{
 		[SerializeField] private WinController winController;
 		public static GameFlow Instance { get; set; }
-		[SerializeField] private AssetReferenceGameObject[] tilemapPrefabs;
+		[SerializeField] private LevelListModel levels;
 		[SerializeField] private AssetReference levelScene;
 		[SerializeField] private AssetReference mainMenu;
 
+		public LevelController.Mode mode;
+		
 		private void Awake()
 		{
 			Instance = this;
@@ -28,9 +29,24 @@ namespace Controllers
 		{
 		MainMenu:
 			int levelIndex = 0;
-			MainMenuCanvasView.Result menuResult = await RunMenu();
+			
+			#if UNITY_EDITOR
+			if (levels.quickLoadLevelIndex != -1)
+			{
+				levelIndex = levels.quickLoadLevelIndex;
+				levels.quickLoadLevelIndex = -1;
+			}
+			#endif
+			MainMenuCanvasView.Result menuResult;
+			if (levelIndex > -1)
+			{
+				menuResult = new MainMenuCanvasView.PlayResult();
+			}
+			else
+			{
+				menuResult = await RunMenu();
+			}
 
-			//Debug.Log($"MenuResult:{menuResult}");
 			if (menuResult is MainMenuCanvasView.QuitResult)
 			{
 				goto Quit;
@@ -49,7 +65,7 @@ namespace Controllers
 				if (levelResult is LevelController.WinResult)
 				{
 					levelIndex++;
-					if (levelIndex == tilemapPrefabs.Length)
+					if (levelIndex == levels.levelPrefabs.Count)
 					{
 						switch (await winController.Run())
 						{
@@ -92,7 +108,7 @@ namespace Controllers
 			Debug.Log($"RunLevel:{levelIndex}");
 			var levelSceneHandle = Addressables.LoadSceneAsync(levelScene, LoadSceneMode.Additive);
 
-			var tilemapHandler = tilemapPrefabs[levelIndex].InstantiateAsync();
+			var tilemapHandler = levels.levelPrefabs[levelIndex].InstantiateAsync();
 
 			//Debug.Log($"Loading Level");
 			await levelSceneHandle.Task;
@@ -107,7 +123,7 @@ namespace Controllers
 			var levelController = FindFirstObjectByType<LevelController>();
 			
 			//Debug.Log($"Running Level");
-			var result = await levelController.Run(terrainTilemap,entitiesTilemap);
+			var result = await levelController.Run(terrainTilemap,entitiesTilemap,mode);
 
 			await Addressables.UnloadSceneAsync(levelSceneHandle).Task;
 			Addressables.ReleaseInstance(tilemapHandler);

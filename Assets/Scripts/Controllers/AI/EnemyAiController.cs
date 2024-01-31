@@ -70,7 +70,10 @@ namespace Controllers.AI
 		}
 
 
-		private float CalculateNormalDistanceBetween(int from, int to) => Vector2.Distance(tilemapModel.IndexToCoordinate(from), tilemapModel.IndexToCoordinate(to));
+		private float CalculateNormalDistanceBetween(int from, int to)
+		{
+			return Vector2.Distance(tilemapModel.IndexToCoordinate(from), tilemapModel.IndexToCoordinate(to));
+		}
 
 		private float CalculateNormalTileCost(int index)
 		{
@@ -82,7 +85,7 @@ namespace Controllers.AI
 				}
 				return 1;
 			}
-			return int.MaxValue;
+			return HighValue;
 		}
 
 		private float CalculateScaredTileCost(int index)
@@ -95,7 +98,7 @@ namespace Controllers.AI
 				}
 				return 1;
 			}
-			return int.MaxValue;
+			return HighValue;
 		}
 
 		public UniTask TakeTurnAsync(CancellationToken token)
@@ -152,6 +155,11 @@ namespace Controllers.AI
 
 		private void ProcessEnemy(int i, PathfinderModel pathFinderModel, Predicate<int> isWalkable, int[] targetPositions)
 		{
+			/*foreach (int targetPosition in targetPositions)
+			{
+				Debug.Log($":{targetPosition}");
+			}*/
+			
 			pathFinderModel.CalculateAdjacencies();
 			pathFinderModel.CalculateCosts();
 			Orientation moveDirection;
@@ -196,27 +204,33 @@ namespace Controllers.AI
 		{
 			//Debug.Log("ProcessScaredEnemy");
 			int enemyIndex = i;
+			var currentEnemy = enemies[enemyIndex];
 			bool IsWalkable(int index)
 			{
 				var entity = tilemapModel.GetEntity(index);
-				return entity == null || entity == enemies[enemyIndex];
+				return entity == null || entity == currentEnemy;
 			}
 
-			var currentEnemy = enemies[enemyIndex];
-			List<int> targetPositions = new List<int>(tilemapModel.FloorTiles.Count);
-			foreach (int tileIndex in tilemapModel.FloorTiles)
+			List<int> targetPositions = new List<int>(tilemapModel.FloorTiles);
+
+			for (int j = 0; j < targetPositions.Count; j++)
 			{
-				var otherEntity = tilemapModel.GetEntity(tileIndex);
-				if (!tilemapModel.IsIlluminated(tileIndex, out _) && (otherEntity == null ||  otherEntity != currentEnemy))
+				var tilePosition = targetPositions[j];
+				bool isIlluminated = tilemapModel.IsIlluminated(tilePosition);
+				var otherEntity = tilemapModel.GetEntity(tilePosition);
+				
+				//Debug.Log($"{tilePosition} Illuminated:{isIlluminated} Entity:{otherEntity}");
+
+				if (isIlluminated || otherEntity != null)
 				{
-					targetPositions.Add(tileIndex);
+					targetPositions.RemoveAt(j);
 				}
 			}
 
-			foreach (SheepEntityModel sheepEntityModel in sheeps)
+			/*foreach (SheepEntityModel sheepEntityModel in sheeps)
 			{
 				targetPositions.Remove(sheepEntityModel.PositionIndex);
-			}
+			}*/
 			ProcessEnemy(i, scaredPathfinder, IsWalkable, targetPositions.ToArray());
 		}
 

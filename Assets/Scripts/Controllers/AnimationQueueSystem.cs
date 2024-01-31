@@ -8,7 +8,7 @@ namespace Controllers
 {
 	public class AnimationQueueSystem : MonoBehaviour
 	{
-		public bool IsPlaying => activeAnimations.Count > 0;
+		public bool IsPlaying => activeAnimations.Count > 0 && mode != Mode.None;
 
 		//cada instancia de animacion tiene la lista de "participantes" y asi podemos definir que animaciones tiene depedencia
 		//Agregar modos de reproduccion. Lineal o Concurrente
@@ -22,6 +22,7 @@ namespace Controllers
 		public Mode mode;
 		public enum Mode
 		{
+			None,
 			Sequential,
 			Parallel
 		}
@@ -29,6 +30,10 @@ namespace Controllers
 		public AnimationInstance Play(IEnumerator animationRoutine, params object[] participants)
 		{
 			var animationInstance = new AnimationInstance(animationRoutine,participants);
+			if (mode == Mode.None)
+			{
+				return animationInstance;
+			}
 			AddActiveAnimation(animationInstance);
 			StartCoroutine(PlayAndPauseAnimation(animationInstance));
 			return animationInstance;

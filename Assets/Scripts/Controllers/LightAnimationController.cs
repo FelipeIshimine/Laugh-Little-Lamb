@@ -56,7 +56,7 @@ namespace Controllers
 
 		private void OnUndoTurnOff(TurnLightOffCommand command)
 		{
-			Debug.Log("OnUndo<TurnOff");
+			//Debug.Log("OnUndo<TurnOff");
 			LightBeamView view = GetLightBeam();
 			view.gameObject.SetActive(true);
 			List<object> participants = new List<object>();
