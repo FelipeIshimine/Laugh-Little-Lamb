@@ -222,11 +222,9 @@ namespace Controllers.Entities
 			}
 			else
 			{
-				if (entityModel is SheepEntityModel playerEntityModel)
+				if (entityModel is SheepEntityModel sheepEntityModel)
 				{
-					return new LookCommand(
-						playerEntityModel,
-						direction);
+					return CreateLookCommand(sheepEntityModel, direction);
 				}
 				return new WaitCommand(entityModel);
 			}
@@ -268,15 +266,18 @@ namespace Controllers.Entities
 			List<CompositeCommand> commands = new List<CompositeCommand>();
 			foreach (var entityModel in sheep)
 			{
-				commands.Add(
-					new CompositeCommand(
-						new TurnLightOffCommand(entityModel, tilemapModel),
-						new LookCommand(entityModel, orientation),
-						new TurnLightOnCommand(entityModel, tilemapModel, lightLength)
-					));
+				commands.Add(CreateLookCommand(entityModel, orientation));
 			}
-
 			return commands;
+		}
+
+		private CompositeCommand CreateLookCommand(SheepEntityModel entityModel, Orientation orientation)
+		{
+			return new CompositeCommand(
+				new TurnLightOffCommand(entityModel, tilemapModel),
+				new LookCommand(entityModel, orientation),
+				new TurnLightOnCommand(entityModel, tilemapModel, lightLength)
+			);
 		}
 
 		public void MoveTogether<T>(IEnumerable<T> entityModels, Orientation direction) where T : EntityModel, IMove
