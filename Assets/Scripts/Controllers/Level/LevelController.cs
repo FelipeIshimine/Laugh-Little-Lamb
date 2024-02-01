@@ -43,11 +43,6 @@ namespace Controllers.Level
 
 		[SerializeField] private int AiModeRefreshRate = 100;
 		
-		public enum Mode
-		{
-			Human,
-			Ai
-		}
 		private async UniTaskVoid Start()
 		{
 			if(GameFlow.Instance == null)
@@ -104,7 +99,7 @@ namespace Controllers.Level
 		public async UniTask<Result> Run(Tilemap terrainTilemap, Tilemap entitiesTilemap, Mode mode)
 		{
 			timeController.Normal();
-			Debug.Log("Level Run");
+			//Debug.Log("Level Run");
 			Initialize(terrainTilemap, entitiesTilemap);
 			resultCompletionSource = new UniTaskCompletionSource<Result>();
 			

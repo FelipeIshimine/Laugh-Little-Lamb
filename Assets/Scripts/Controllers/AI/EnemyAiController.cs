@@ -52,7 +52,7 @@ namespace Controllers.AI
 			scaredPathfinder = new PathfinderModel(
 				this.tilemapModel.Count, 
 				x=>this.tilemapModel.GetNeighbours(x).ToArray(),
-				ScaredIsWalkable,
+				IsWalkableWhileScared,
 				CalculateScaredTileCost,
 				CalculateNormalDistanceBetween);
 		}
@@ -63,10 +63,10 @@ namespace Controllers.AI
 			return this.tilemapModel.IsFloor(index) && (otherEntity == null || otherEntity is SheepEntityModel || otherEntity is EnemyEntityModel);
 		}
 		
-		private bool ScaredIsWalkable(int index)
+		private bool IsWalkableWhileScared(int index)
 		{
 			var otherEntity = tilemapModel.GetEntity(index);
-			return this.tilemapModel.IsFloor(index) && (otherEntity == null || otherEntity is SheepEntityModel || otherEntity is EnemyEntityModel);
+			return tilemapModel.IsFloor(index) && otherEntity is null or EnemyEntityModel;
 		}
 
 
@@ -98,7 +98,7 @@ namespace Controllers.AI
 				}
 				return 1;
 			}
-			return HighValue;
+			return int.MaxValue;
 		}
 
 		public UniTask TakeTurnAsync(CancellationToken token)
@@ -154,8 +154,8 @@ namespace Controllers.AI
 		}
 
 		private void ProcessEnemy(int i, PathfinderModel pathFinderModel, Predicate<int> isWalkable, int[] targetPositions)
-		{
-			/*foreach (int targetPosition in targetPositions)
+		{/*
+			foreach (int targetPosition in targetPositions)
 			{
 				Debug.Log($":{targetPosition}");
 			}*/
@@ -176,7 +176,7 @@ namespace Controllers.AI
 				ref path,
 				out var pathCost);
 
-			if (success && path.Count > 1)
+			if (path.Count > 1 && enemyEntityModel.PositionIndex == path[0])
 			{
 				var startColor = Color.blue;
 				var endColor = Color.red;
@@ -189,7 +189,7 @@ namespace Controllers.AI
 						Color.Lerp(startColor, endColor, (float)j / (path.Count - 1)));
 				}
 
-				Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
+				//Assert.AreEqual(enemyEntityModel.PositionIndex, path[0]);
 				var offset = tilemapModel.IndexToCoordinate(path[1]) - tilemapModel.IndexToCoordinate(path[0]);
 				moveDirection = OffsetToOrientation(offset);
 			}
@@ -198,6 +198,7 @@ namespace Controllers.AI
 				moveDirection = Orientation.None;
 			}
 			entitiesController.Move(enemies[i], moveDirection);
+			//Debug.Break();
 		}
 
 		private void ProcessScaredEnemy(int i)
@@ -213,7 +214,7 @@ namespace Controllers.AI
 
 			List<int> targetPositions = new List<int>(tilemapModel.FloorTiles);
 
-			for (int j = 0; j < targetPositions.Count; j++)
+			for (int j = targetPositions.Count - 1; j >= 0; j--)
 			{
 				var tilePosition = targetPositions[j];
 				bool isIlluminated = tilemapModel.IsIlluminated(tilePosition);

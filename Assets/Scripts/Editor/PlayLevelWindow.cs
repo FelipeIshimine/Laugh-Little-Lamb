@@ -8,9 +8,10 @@ using UnityEngine.UIElements;
 
 public class PlayLevelWindow : UnityEditor.EditorWindow
 {
-	private LevelListModel listModel;
+	private GameSettings gameSettings;
 	private Editor cacheEditor;
 	private List<string> labels;
+	private DropdownField dropdown;
 
 	[MenuItem("Window/Levels")]
 	public static void Open()
@@ -19,44 +20,46 @@ public class PlayLevelWindow : UnityEditor.EditorWindow
 	}
 	private void CreateGUI()
 	{
-		var guids= AssetDatabase.FindAssets($"t:{nameof(LevelListModel)}");
+		rootVisualElement.Clear();
+		var guids= AssetDatabase.FindAssets($"t:{nameof(GameSettings)}");
 		
 		if(guids.Length > 0)
 		{
-			listModel = AssetDatabase.LoadAssetAtPath<LevelListModel>(AssetDatabase.GUIDToAssetPath(guids[0]));
+			gameSettings = AssetDatabase.LoadAssetAtPath<GameSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
 		}
-Debug.Log(listModel == null);
-		if (listModel)
+		//Debug.Log(gameSettings == null);
+		if (gameSettings)
 		{
-			var serializedObject = new SerializedObject(listModel);
-			Editor.CreateCachedEditor(listModel, null, ref cacheEditor);
-			var inspector = cacheEditor.CreateInspectorGUI();
-			if (inspector != null)
-			{
-				inspector.Bind(serializedObject);
-				rootVisualElement.Add(inspector);
-			}
-			else
-			{
-				Debug.Log("Inspector is null");
-			}
-			
-			labels = listModel.levelPrefabs.ConvertAll(x => x.editorAsset.name);
-			var dropdown = new DropdownField(labels,-1, OnSelection);
+			var serializedObject = new SerializedObject(gameSettings);
+
+			RefreshDropdown();
 			rootVisualElement.Add(dropdown);
+			rootVisualElement.Add(new PropertyField(serializedObject.FindProperty(nameof(GameSettings.mode))));
+			
+			rootVisualElement.Add(new PropertyField(serializedObject.FindProperty(nameof(GameSettings.levelPrefabs))));
+			
+			rootVisualElement.Bind(serializedObject);
 		}
+		
+		rootVisualElement.Add(new Button(CreateGUI){text = "Refresh"});
+	}
+
+	private void RefreshDropdown()
+	{
+		dropdown?.RemoveFromHierarchy();
+		labels = gameSettings.levelPrefabs.ConvertAll(x => x.editorAsset.name);
+		dropdown = new DropdownField(labels,-1, OnSelection);
 	}
 
 	private string OnSelection(string arg)
 	{
-		int index = listModel.levelPrefabs.FindIndex(x => x.editorAsset.name == arg);
+		int index = gameSettings.levelPrefabs.FindIndex(x => x.editorAsset.name == arg);
 		if (index != -1)
 		{
 			EditorSceneManager.OpenScene(EditorBuildSettings.scenes[0].path, OpenSceneMode.Single);
-			listModel.quickLoadLevelIndex = index;
+			gameSettings.quickLoadLevelIndex = index;
 			EditorApplication.EnterPlaymode();
 		}
-
 		return arg;
 	}
 }

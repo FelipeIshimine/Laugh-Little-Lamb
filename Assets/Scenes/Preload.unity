@@ -385,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winController: {fileID: 1757542301}
-  levels: {fileID: 11400000, guid: 0fe73370dd1ad4541a4b11447db59c4d, type: 2}
+  settings: {fileID: 11400000, guid: 0fe73370dd1ad4541a4b11447db59c4d, type: 2}
   levelScene:
     m_AssetGUID: 51137e3347aa2e644ba0179e283d07eb
     m_SubObjectName: 
@@ -396,7 +396,6 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-  mode: 0
 --- !u!82 &1727739011
 AudioSource:
   m_ObjectHideFlags: 0

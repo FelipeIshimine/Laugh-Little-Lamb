@@ -19,7 +19,7 @@ namespace Controllers.CommandAnimations
 		protected override void Initialize()
 		{
 			doListener = ExitCommand.OnDo.AddListener(OnDoCommand);
-			undoListener = ExitCommand.OnUndo.AddListener(OnUnDoCommand);
+			undoListener = ExitCommand.OnUndo.AddListener(OnUndoCommand);
 		}
 
 		public override void Terminate()
@@ -30,7 +30,7 @@ namespace Controllers.CommandAnimations
 
 		protected void OnDoCommand(ExitCommand command)
 		{
-			Debug.Log($"OnCommand:{command}");
+			//Debug.Log($"OnCommand:{command}");
 			var view = ModelToView[command.SheepModel];
 			var position = command.Door.PositionIndex;
 			var otherEntityModel = command.Model.GetEntity(position);
@@ -45,8 +45,9 @@ namespace Controllers.CommandAnimations
 			}
 		}
 
-		private void OnUnDoCommand(ExitCommand command)
+		private void OnUndoCommand(ExitCommand command)
 		{
+            Debug.Log("OnUndo Exit Command");
 			var view = ModelToView[command.SheepModel];
 			var position = command.StartPosition;
 			var otherEntityModel = command.Model.GetEntity(position);
@@ -84,7 +85,7 @@ namespace Controllers.CommandAnimations
 			do
 			{
 				t += Time.deltaTime / animDuration;
-				view.transform.localScale = Vector3.LerpUnclamped(startScale,Vector3.zero, 1-animCurve.Evaluate(t));
+				view.transform.localScale = Vector3.LerpUnclamped(Vector3.one,startScale, 1-animCurve.Evaluate(t));
 				yield return null;
 			} while (t<1);
 		}

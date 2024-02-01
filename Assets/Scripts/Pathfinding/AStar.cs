@@ -120,7 +120,7 @@ namespace Pathfinding
 		{
 			path.Clear();
 			int[] previous = new int[count];
-			int[] bestCost = new int[count];
+			float[] bestCost = new float[count];
 			
 			for (int i = 0; i < count; i++)
 			{
@@ -132,11 +132,10 @@ namespace Pathfinding
 
 			foreach (int startPosition in startPositions)
 			{
-				bestCost[startPosition] = 0;
-				next.Enqueue(0, startPosition);
-				Debug.Log($"Find Path {startPosition} => {destination}");
+				var score = bestCost[startPosition] = getCost(startPosition);
+				next.Enqueue((int)score, startPosition);
+				//Debug.Log($"Find Path {startPosition} => {destination}");
 			}
-            
 
 			int closestIndex = -1;
 			float closestDistance = float.MaxValue;
@@ -144,9 +143,9 @@ namespace Pathfinding
 
 			while (next.Count > 0)
 			{
-			
 				var (currentScore, index) = next.Dequeue();
 
+				//Debug.Log($"{index}>{currentScore}");
 				if (index == destination)
 				{
 					closestIndex = index;
@@ -171,7 +170,7 @@ namespace Pathfinding
 								closestDistance = distance;
 							}
 
-							Debug.Log($"{index}=> {neighbour}   {bestCost[neighbour]}:{newScore}");
+							//Debug.Log($"{index}=> {neighbour}   {bestCost[neighbour]}:{newScore}");
 							bestCost[neighbour] = newScore;
 							previous[neighbour] = index;
 							next.Enqueue(newScore, neighbour);
@@ -184,16 +183,17 @@ namespace Pathfinding
 
 			if (closestIndex != -1)
 			{
-				pathCost = bestCost[closestIndex];
+				pathCost = Mathf.RoundToInt(bestCost[closestIndex]);
 				HashSet<int> visited = new HashSet<int>();
 				
 				while (closestIndex != -1)
 				{
 					if (!visited.Add(closestIndex))
 					{
-						Debug.Break();
+						//Debug.Break();
 						break;
 					}
+					//Debug.Log(closestIndex);
 					path.Add(closestIndex);
 					closestIndex = previous[closestIndex];
 				}

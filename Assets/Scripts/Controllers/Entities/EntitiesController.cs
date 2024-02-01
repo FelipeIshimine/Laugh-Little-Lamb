@@ -198,7 +198,11 @@ namespace Controllers.Entities
 				{
 					if (targetEntity is DoorEntityModel door)
 					{
-						return new LookMoveAndExitCommand(sheepEntityModel, door,tilemapModel,direction, this);
+						return
+							new CompositeCommand(
+								new TurnLightOffCommand(sheepEntityModel, tilemapModel),
+								new LookMoveAndExitCommand(sheepEntityModel, door,tilemapModel,direction, this)
+								);
 					}
 					
 					return new CompositeCommand(

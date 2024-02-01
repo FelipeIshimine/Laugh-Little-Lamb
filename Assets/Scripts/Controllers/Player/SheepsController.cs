@@ -150,7 +150,7 @@ namespace Controllers.Player
 			{
 				return;
 			}
-			Debug.Log("Undo");
+			//Debug.Log("Undo");
 			if (commandsController.HistoryStack.Count > 1 && commandsController.HistoryStack.Peek() is SheepTurnStart)
 			{
 				commandsController.Undo();
