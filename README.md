@@ -21,8 +21,7 @@ Some changes from the original version are:
 Besides the GGJ24 Theme "Make me Laugh", we also wanted to make a game that could be a "Test ground" for some features we needed to try before adding to our other main project "Legion" (https://twitter.com/PlayLegionGame).
 Because of that we decided to make a "Turn Based" game where multiple entities could execute "Composed Actions" in order **but** play their animations in "parallel" (if said animations do not share participants). 
 
-## Example project for beginners and intermediate programmers
-I personally also wanned to share a "real example" of how to apply some common programming patters in an "Real Game" instead of the common "Whiteboard examples" that people usually use on classrooms or youtube videos. Something that could have helped me when I started making games on my own 8 years ago.
+On the other hand, I personally, wanted to share an example of how some of this common programming patters could be applied to a "Real Game" instead of the common "Whiteboard examples" that people usually use on classrooms or youtube videos. Something that could have helped me when I started making games on my own 8 years ago.
 So if you are a beginner or a intermediate programmer this project could be of use for you. _Keep in mind_, this code is MY interpretation/implementation of these patterns and ideas for **this** especific game. 
 You **will** find, bad code and bad design decisions, so take anything you see here with a grain of salt.
 
@@ -50,3 +49,5 @@ You **will** find, bad code and bad design decisions, so take anything you see h
 - Unity Tilemap System:
   - Levels are designed using the Unity TilemapSystem then a TilemapController, reads the content of the Tilemap, and generates everything it needs from it, making level making really fast and easy.
 - Unity Addressables System.
+
+
