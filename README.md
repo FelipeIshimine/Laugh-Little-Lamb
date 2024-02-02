@@ -42,5 +42,10 @@ You **will** find, bad code and bad design decisions, so take anything you see h
   - None: No animation is played. (Useful for automated testing)
   - Sequencial: Every animations goes into a Queue, and start only after the previous animation ends.
   - Parallel: Every animation starts the moment it doesnt have any "dependent" animation running. Each animation instance has an array of Participants, which is used for determining dependencies.
+- **2D Pathfinding**
+  - Using A*, for multi destination, path finding. 
 - **UniTask** for async programming in some places for convenience.
-
+- **Automated Level Playtesting** _Work in progress_
+- Unity Tilemap System:
+  - Levels are designed using the Unity TilemapSystem then a TilemapController, reads the content of the Tilemap, and generates everything it needs from it, making level making really fast and easy.
+- Unity Addressables System.
