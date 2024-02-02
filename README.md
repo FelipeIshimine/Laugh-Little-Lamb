@@ -6,10 +6,11 @@ Updated Unity 2022.3.17f project for the game "Laugh Little Lamb" from the Globa
 
 Some changes from the original version are:
 
-- Some animations have been added/or molished.
+- Removed Paid Assets (OdinInspector)
+- Some animations have been added/or polished.
 - Scripts names and folder structure have been changed making the project cleaner.
 - Bug Fixes:
-  - Pathfinding crashed under some circunstances.
+  - Pathfinding crashed under some circumstances.
   - Do/Undo system sometimes executed in the wrong order when a level had multiple enemies. 
 
 ### Nonetheless the main design decisions of the project have been preserved, and no mayor refactoring was done.
